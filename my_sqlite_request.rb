@@ -69,6 +69,9 @@ class MySqliteRequest
   def delete
   end
 
+  def run
+    # have to bulid private methods, for each CLAUSE, to manipulate data based on query request
+  end
   # def to_s
   #   "Table Data: #{@table_data}\nSelected Column: #{@selected_column}\nWhere Column: #{@where_column}\nWhere Criteria: #{@where_criteria}\nJoin Column DB A: #{@join_column_db_a}\nJoin Filename DB B: #{@join_filename_db_b}\nJoin Column DB B: #{@join_column_db_b}\nOrder Type: #{@order_type}\nOrder Column: #{@order_column}\nInsert Table Name: #{@insert_table_name}\nInsert Values: #{@insert_values}\nUpdate Table Name: #{@update_table_name}\nUpdate Set Data: #{@update_set_data}"
   # end
