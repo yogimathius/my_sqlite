@@ -159,13 +159,13 @@ class MySqliteRequest
             row[where_attribute[0]] == where_attribute[1]
         end
     end
-    
     File.open(@table_name, 'w') do |csv_file|
         csv_file << csv.headers
         csv.each do |row|
             csv_file << row
         end
     end
+
   def _run_update
     csv = CSV.read(@table_name, headers: true)
     @where_params.each do |where_attribute|
