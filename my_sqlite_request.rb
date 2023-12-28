@@ -160,6 +160,17 @@ class MySqliteRequest
     end
   end
 
+  def _run_delete
+    result = []
+    lines = File.readlines(@table_name)
+    CSV.parse(lines, headers: true).each do |row|
+        @where_params.each do |where_attribute|
+            lines.delete_if { row[where_attribute[0]] == where_attribute[1] } 
+        end
+    end
+    result
+  end
+
 
   def _setTypeOfRequest(new_type)
     if (@type_of_request == :none or @type_of_request == new_type)
