@@ -21,41 +21,25 @@ class MySqliteRequest
     @update_attributes  = []
     @table_name         = nil
     @order              = :asc
-    # @selected_column = nil
-    # @where_column = nil
-    # @where_criteria = nil
-    # @join_column_db_a = nil
-    # @join_filename_db_b = nil
-    # @join_column_db_b = nil
-    # @order_type = nil
-    # @order_column = nil
-    # @insert_table_name = nil
-    # @insert_values = nil
-    # @update_table_name = nil
-    # @update_set_data = nil
   end
 
   def from(table_name)
     @table_name = table_name
-    # @table_data = CSV.read(table_name, headers: true)
     self
   end
 
   def select(columns)
-    if (columns.is_a?(Array))
+    if columns.is_a?(Array)
         @select_columns += columns.collect { |elem| elem.to_s }
     else 
         @select_columns << columns.to_s
     end
     self._setTypeOfRequest(:select)
-    # @selected_column = column_name
     self
   end
 
   def where(column_name, criteria)
     @where_params << [column_name, criteria]
-    # @where_column = column_name
-    # @where_criteria = criteria
     self
   end
 
@@ -75,12 +59,11 @@ class MySqliteRequest
   def insert(table_name)
     self._setTypeOfRequest(:insert)
     @table_name = table_name
-    # @insert_table_name = table_name
     self
   end
 
   def values(data)
-    if (@type_of_request == :insert)
+    if @type_of_request == :insert
         @insert_attributes = data
     else
         raise 'Wrong type of request to call values()'
@@ -91,7 +74,6 @@ class MySqliteRequest
   def update(table_name)
     self._setTypeOfRequest(:update)
     @table_name = table_name
-    # @update_table_name = table_name
     self
   end
 
@@ -111,7 +93,7 @@ class MySqliteRequest
   end
 
   def print_insert_type
-    puts "Inset Attributes #{@insert_attributes}"
+    puts "Insert Attributes #{@insert_attributes}"
     # puts "Where Attributes #{@where_params}"
   end
 
@@ -119,32 +101,38 @@ class MySqliteRequest
     puts "Where Attributes #{@where_params}"
   end
 
+    
+  def print_update_type
+    puts "Update Set Data #{@update_set_data}"
+    puts "Where Attributes #{@where_params}"
+  end
+
   def print
     puts "Type of Request #{@type_of_request}"
     puts "Table Name #{@table_name}"
-    if (@type_of_request == :select)
+    if @type_of_request == :select
         print_select_type
-    elsif (@type_of_request == :insert)
+    elsif @type_of_request == :insert
         print_insert_type
     elsif (@type_of_request == :delete)
         print_delete_type
+    elsif @type_of_request == :update
+        print_update_type
     end
   end
 
   def run
     print
-    if (@type_of_request == :select)
+    if @type_of_request == :select
         _run_select
-    elsif (@type_of_request == :insert)
+    elsif @type_of_request == :insert
         _run_insert
     elsif (@type_of_request == :delete)
         _run_delete
+    elsif @type_of_request == :update
+        _run_update
     end
-    # have to bulid private methods, for each CLAUSE, to manipulate data based on query request
   end
-  # def to_s
-  #   "Table Data: #{@table_data}\nSelected Column: #{@selected_column}\nWhere Column: #{@where_column}\nWhere Criteria: #{@where_criteria}\nJoin Column DB A: #{@join_column_db_a}\nJoin Filename DB B: #{@join_filename_db_b}\nJoin Column DB B: #{@join_column_db_b}\nOrder Type: #{@order_type}\nOrder Column: #{@order_column}\nInsert Table Name: #{@insert_table_name}\nInsert Values: #{@insert_values}\nUpdate Table Name: #{@update_table_name}\nUpdate Set Data: #{@update_set_data}"
-  # end
 
   private
 
@@ -180,6 +168,19 @@ class MySqliteRequest
             csv_file << row
         end
     end
+  def _run_update
+    csv = CSV.read(@table_name, headers: true)
+    @where_params.each do |where_attribute|
+        csv.find do |row|
+            if row[where_attribute[0]] == where_attribute[1]
+                @update_set_data.keys.each do |update_key|
+                    update_value = @update_set_data[update_key]
+                    row[update_key] = update_value
+                end
+            end
+        end
+    end
+    File.open(@table_name, 'w') { |f| f.puts(csv) }
   end
 
   def _setTypeOfRequest(new_type)
@@ -189,13 +190,14 @@ class MySqliteRequest
         raise "Invalid: type of request already set to #{@type_of_request} (new_type => #{@new_type})"
     end
   end
-
 end
 
 def _main()
 =begin
     # testing select query
     request = MySqliteRequest.new
+
+=begin
     request = request.from('nba_player_data.csv')
     request = request.select('name')
     request = request.where('year_start', '1991')
@@ -232,16 +234,10 @@ _main()
 # request = request.from('nba_player_data.csv')
 # puts request
 
-# request = request.select('name')
-# request = request.where('team', 'Lakers')
-# puts request
-# request = request.join('player_id', 'teams.csv', 'team_id')
-# request = request.order('asc', 'points')
-# puts request
-# request = request.insert('new_players')
-# request = request.values({ 'name' => 'LeBron James', 'team' => 'Lakers', 'points' => 25 })
-# puts request
-# request = request.update('player_data')
-# request = request.set({ 'points' => 30 })
+    request = request.update('nba_player_data_test.csv')
+    request = request.set({"name" => "Bud Updated", "college" => "Hillsdale College Updated"})
+    request = request.where('name', 'Bud Acton')
+    request.run
+end
 
-# puts request
+_main()
