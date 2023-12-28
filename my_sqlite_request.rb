@@ -124,6 +124,8 @@ class MySqliteRequest
         print_select_type
     elsif (@type_of_request == :insert)
         print_insert_type
+    elsif (@type_of_request == :delete)
+        print_delete_type
     end
   end
 
@@ -132,6 +134,8 @@ class MySqliteRequest
     if (@type_of_request == :select)
         _run_select
     elsif (@type_of_request == :insert)
+        _run_insert
+    elsif (@type_of_request == :delete)
         _run_insert
     end
     # have to bulid private methods, for each CLAUSE, to manipulate data based on query request
@@ -184,6 +188,7 @@ end
 
 def _main()
 =begin
+    # testing select query
     request = MySqliteRequest.new
     request = request.from('nba_player_data.csv')
     request = request.select('name')
@@ -191,6 +196,8 @@ def _main()
     p request.run.count
 =end
 
+=begin
+    # testing insert query
     request = MySqliteRequest.new
     request = request.insert('nba_player_data_test.csv')
     request = request.values({"name" => "Bud Acton", "year_start" => "1968", "year_end" => "1968", "position" => "F", "height" => "6-6" , "weight" => "210", "birth_date" => "January 11, 1942", "college" => "Hillsdale College"
@@ -198,6 +205,15 @@ def _main()
     request = request.where('year_start', '1991')
     request = 
     request.run
+=end
+
+    # testing delete query
+    request = MySqliteRequest.new
+    request = request.from('nba_player_data.csv')
+    request = request.delete
+    request = request.where('year_start', '1991')
+    request.run
+
 end
 
 _main()
