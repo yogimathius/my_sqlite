@@ -159,12 +159,8 @@ class MySqliteRequest
             row[where_attribute[0]] == where_attribute[1]
         end
     end
-    File.open(@table_name, 'w') do |csv_file|
-        csv_file << csv.headers
-        csv.each do |row|
-            csv_file << row
-        end
-    end
+    File.open(@table_name, 'w') { |f| f.puts(csv) }
+  end
 
   def _run_update
     csv = CSV.read(@table_name, headers: true)
@@ -232,10 +228,7 @@ _main()
 # request = request.from('nba_player_data.csv')
 # puts request
 
-    request = request.update('nba_player_data_test.csv')
-    request = request.set({"name" => "Bud Updated", "college" => "Hillsdale College Updated"})
-    request = request.where('name', 'Bud Acton')
-    request.run
-end
-
-_main()
+    # request = request.update('nba_player_data_test.csv')
+    # request = request.set({"name" => "Bud Updated", "college" => "Hillsdale College Updated"})
+    # request = request.where('name', 'Bud Acton')
+    # request.run
