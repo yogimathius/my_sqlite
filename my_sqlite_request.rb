@@ -67,7 +67,7 @@ class MySqliteRequest
   end
 
   def order(order_type, column_name)
-    @order_type = order_type
+    @order = order_type
     @order_column = column_name
     self
   end
@@ -82,11 +82,11 @@ class MySqliteRequest
   def values(data)
     if (@type_of_request == :insert)
         @insert_attributes = data
+    elsif (@type_of_request == :update)
+        # TODO set update attributes HERE
     else
         raise 'Wrong type of request to call values()'
     end
-
-    # @insert_values = data
     self
   end
 
@@ -185,6 +185,7 @@ def _main()
     request = request.values({"name" => "Bud Acton", "year_start" => "1968", "year_end" => "1968", "position" => "F", "height" => "6-6" , "weight" => "210", "birth_date" => "January 11, 1942", "college" => "Hillsdale College"
 })
     request = request.where('year_start', '1991')
+    request = 
     request.run
 end
 
