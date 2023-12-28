@@ -82,8 +82,6 @@ class MySqliteRequest
   def values(data)
     if (@type_of_request == :insert)
         @insert_attributes = data
-    elsif (@type_of_request == :update)
-        # TODO set update attributes HERE
     else
         raise 'Wrong type of request to call values()'
     end
@@ -169,16 +167,20 @@ class MySqliteRequest
   end
 
   def _run_delete
-    result = []
-    lines = File.readlines(@table_name)
-    CSV.parse(lines, headers: true).each do |row|
-        @where_params.each do |where_attribute|
-            lines.delete_if { row[where_attribute[0]] == where_attribute[1] } 
+    csv = CSV.read(@table_name, headers: true)
+    @where_params.each do |where_attribute|
+        csv.delete_if do |row|
+            row[where_attribute[0]] == where_attribute[1]
         end
     end
-    result
+    
+    File.open(@table_name, 'w') do |csv_file|
+        csv_file << csv.headers
+        csv.each do |row|
+            csv_file << row
+        end
+    end
   end
-
 
   def _setTypeOfRequest(new_type)
     if (@type_of_request == :none or @type_of_request == new_type)
