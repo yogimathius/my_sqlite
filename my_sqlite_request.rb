@@ -94,13 +94,11 @@ class MySqliteRequest
 
   def print_insert_type
     puts "Insert Attributes #{@insert_attributes}"
-    # puts "Where Attributes #{@where_params}"
   end
 
   def print_delete_type
     puts "Where Attributes #{@where_params}"
   end
-
     
   def print_update_type
     puts "Update Set Data #{@update_set_data}"
@@ -114,7 +112,7 @@ class MySqliteRequest
         print_select_type
     elsif @type_of_request == :insert
         print_insert_type
-    elsif (@type_of_request == :delete)
+    elsif @type_of_request == :delete
         print_delete_type
     elsif @type_of_request == :update
         print_update_type
@@ -127,7 +125,7 @@ class MySqliteRequest
         _run_select
     elsif @type_of_request == :insert
         _run_insert
-    elsif (@type_of_request == :delete)
+    elsif @type_of_request == :delete
         _run_delete
     elsif @type_of_request == :update
         _run_update
