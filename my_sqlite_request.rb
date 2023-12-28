@@ -117,6 +117,10 @@ class MySqliteRequest
     # puts "Where Attributes #{@where_params}"
   end
 
+  def print_delete_type
+    puts "Where Attributes #{@where_params}"
+  end
+
   def print
     puts "Type of Request #{@type_of_request}"
     puts "Table Name #{@table_name}"
@@ -136,7 +140,7 @@ class MySqliteRequest
     elsif (@type_of_request == :insert)
         _run_insert
     elsif (@type_of_request == :delete)
-        _run_insert
+        _run_delete
     end
     # have to bulid private methods, for each CLAUSE, to manipulate data based on query request
   end
@@ -209,9 +213,9 @@ def _main()
 
     # testing delete query
     request = MySqliteRequest.new
-    request = request.from('nba_player_data.csv')
+    request = request.from('nba_player_data_test.csv')
     request = request.delete
-    request = request.where('year_start', '1991')
+    request = request.where('college', 'Duke University')
     request.run
 
 end
