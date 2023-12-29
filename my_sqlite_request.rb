@@ -99,7 +99,6 @@ class MySqliteRequest
   def print_delete_type
     puts "Where Attributes #{@where_params}"
   end
-
     
   def print_update_type
     puts "Update Set Data #{@update_set_data}"
@@ -165,12 +164,7 @@ class MySqliteRequest
         end
     end
     
-    File.open(@table_name, 'w') do |csv_file|
-        csv_file << csv.headers
-        csv.each do |row|
-            csv_file << row
-        end
-    end
+    File.open(@table_name, 'w') { |f| f.puts(csv) }
   end
 
   def _run_update
@@ -197,43 +191,39 @@ class MySqliteRequest
   end
 end
 
-# def _main
-#     request = MySqliteRequest.new
-    
-#     # ===== testing select query =====
-#     request = request.from('nba_player_data.csv')
-#     request = request.select('name')
-#     # request = request.where('year_start', '1991') # can be called optionally
-#     p request.run
+request = MySqliteRequest.new
 
-#     # ===== testing insert query ======
-#     # request = request.insert('nba_player_data_test.csv')
-#     # request = request.values({
-#     #     "name" => "Bud Acton",
-#     #     "year_start" => "1968",
-#     #     "year_end" => "1968",
-#     #     "position" => "F",
-#     #     "height" => "6-6" ,
-#     #     "weight" => "210",
-#     #     "birth_date" => "January 11, 1942",
-#     #     "college" => "Hillsdale College"
-#     # })
-#     # request = request.where('year_start', '1991')
-#     # request = 
-#     # request.run
-    
-#     # ===== testing update query =====
-#     # request = request.update('nba_player_data_test.csv')
-#     # request = request.set({"name" => "Bud Updated", "college" => "Hillsdale College Updated"})
-#     # request = request.where('name', 'Bud Acton')
-#     # request.run
+# ===== testing select query =====
+# request = request.from('nba_player_data.csv')
+# request = request.select('name')
+# request = request.where('year_start', '1991') # can be called optionally
+# p request.run
 
-#     # ===== testing delete query =====
-#     # request = MySqliteRequest.new
-#     # request = request.from('nba_player_data_test.csv')
-#     # request = request.delete
-#     # request = request.where('college', 'Duke University')
-#     # request.run
-# end
+# ===== testing insert query ======
+# request = request.insert('nba_player_data_test.csv')
+# request = request.values({
+#     "name" => "Bud Acton",
+#     "year_start" => "1968",
+#     "year_end" => "1968",
+#     "position" => "F",
+#     "height" => "6-6" ,
+#     "weight" => "210",
+#     "birth_date" => "January 11, 1942",
+#     "college" => "Hillsdale College"
+# })
+# request = request.where('year_start', '1991')
+# request = 
+# request.run
 
-# _main
+# ===== testing update query =====
+# request = request.update('nba_player_data_test.csv')
+# request = request.set({"name" => "Bud Updated", "college" => "Hillsdale College Updated"})
+# request = request.where('name', 'Bud Acton')
+# request.run
+
+# ===== testing delete query =====
+# request = MySqliteRequest.new
+# request = request.from('nba_player_data_test.csv')
+# request = request.delete
+# request = request.where('college', 'Hillsdale College Updated')
+# request.run
