@@ -44,6 +44,21 @@ class MySqliteRequestTest < Test::Unit::TestCase
     assert_equal(expected_result, result)
   end
 
+  def test_update_query
+    query = @request.update('test_data.csv').set({'name' => 'Jane Updated'}).where('id', '2')
+    result = query.run
+
+    result = CSV.read('test_data.csv', headers: true).map(&:to_h)
+
+    expected_result = [
+      {'id' => '1', 'name' => 'John', 'age' => '25'},
+      {'id' => '2', 'name' => 'Jane Updated', 'age' => '30'},
+      {'id' => '3', 'name' => 'Bob', 'age' => '22'},
+    ]
+
+    assert_equal(expected_result, result)
+  end
+
   def teardown
     File.delete('test_data.csv') if File.exist?('test_data.csv')
   end

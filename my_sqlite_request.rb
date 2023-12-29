@@ -191,7 +191,7 @@ class MySqliteRequest
   end
 end
 
-request = MySqliteRequest.new
+# request = MySqliteRequest.new
 
 # ===== testing select query =====
 # request = request.from('nba_player_data.csv')
