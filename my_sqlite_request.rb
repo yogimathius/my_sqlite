@@ -28,7 +28,10 @@ class MySqliteRequest
     self
   end
 
-
+  def into(table_name)
+    @table_name = table_name
+    self
+  end
 
   def select(columns)
     if columns.is_a?(Array)
