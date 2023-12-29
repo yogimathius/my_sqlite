@@ -3,10 +3,23 @@ require "readline"
 class MySqliteQueryCli
     def parse(buf)
         p buf
-        if select_index = buf.index("SELECT")
-        parts = buf.split.map(&:upcase)
-        num_tokens = parts.count
+        if buf.include?("SELECT")
+            parse_select(buf)
+            parse_from(buf)
+            parse_where(buf)
+        elsif buf.include?("INSERT")
+        elsif buf.include?("UPDATE")
+        elsif buf.include?("DELETE")
+        end
+
+        # parts = buf.split.map(&:upcase)
+        # num_tokens = parts.count
     end
+
+    def parse_select(query)
+
+    end
+
 
     def run!
         while buf = Readline.readline("> ", true)
