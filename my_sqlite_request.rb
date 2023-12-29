@@ -28,6 +28,8 @@ class MySqliteRequest
     self
   end
 
+
+
   def select(columns)
     if columns.is_a?(Array)
         @select_columns += columns.collect { |elem| elem.to_s }
