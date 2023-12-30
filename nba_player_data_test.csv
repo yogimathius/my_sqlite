@@ -1,4 +1,5 @@
-["name", "year_start", "year_end", "position", "height", "weight", "birth_date", "college"]Zaid Abdul-Aziz,1969,1978,C-F,6-9,235,"April 7, 1946",Iowa State University
+name,year_start,year_end,position,height,weight,birth_date,college
+Zaid Abdul-Aziz,1969,1978,C-F,6-9,235,"April 7, 1946",Iowa State University
 Kareem Abdul-Jabbar,1970,1989,C,7-2,225,"April 16, 1947","University of California, Los Angeles"
 Mahmoud Abdul-Rauf,1991,2001,G,6-1,162,"March 9, 1969",Louisiana State University
 Tariq Abdul-Wahad,1998,2003,F,6-6,223,"November 3, 1974",San Jose State University
@@ -11,3 +12,4 @@ Alex Acker,2006,2009,G,6-5,185,"January 21, 1983",Pepperdine University
 Don Ackerman,1954,1954,G,6-0,183,"September 4, 1930",Long Island University
 Mark Acres,1988,1993,F-C,6-11,220,"November 15, 1962",Oral Roberts University
 Bud Updated,1968,1968,F,6-6,210,"January 11, 1942",Hillsdale College Updated
+Bud Acton,1968,1968,F,6-6,210,January 11, 1942,Hillsdale College
