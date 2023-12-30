@@ -4,7 +4,6 @@ Part I Describing scope of project
 # INSERT QUERY
 # UPDATE QUERY
 # DELETE QUERY
-
 #1 Type of request
 #2 Set variable settings
 #3 Run
@@ -162,7 +161,6 @@ class MySqliteRequest
             row[where_attribute[0]] == where_attribute[1]
         end
     end
-    
     File.open(@table_name, 'w') { |f| f.puts(csv) }
   end
 
