@@ -41,12 +41,23 @@ class MySqliteQueryCli
         # puts "where_parts = #{@where_parts}"
     end
 
+    def parse_insert(query)
+        values_index = query.index(" VALUES")
+        insert_string = query.slice(0, values_index)
+        string = query.slice(values_index..)
+        value_string = string.delete("(,);")
+        @insert_parts = insert_string.split
+        @insert_values = value_string.split
+        puts "insert_parts = #{@insert_parts}"
+        puts "insert_parts = #{@insert_values}"
+    end
+
     def parse(buf)
         p buf
         if buf.include?("SELECT")
             parse_select(buf)
-        # elsif buf.include?("INSERT")
-        #     parse_insert(buf)
+        elsif buf.include?("INSERT")
+            parse_insert(buf)
         # elsif buf.include?("UPDATE")
         #     parse_update(buf)
         # elsif buf.include?("DELETE")
