@@ -4,7 +4,6 @@ Part I Describing scope of project
 # INSERT QUERY
 # UPDATE QUERY
 # DELETE QUERY
-
 #1 Type of request
 #2 Set variable settings
 #3 Run
@@ -185,50 +184,3 @@ class MySqliteRequest
     end
   end
 end
-
-# def _main()
-# =begin
-#     # testing select query
-#     request = MySqliteRequest.new
-
-# =begin
-#     request = request.from('nba_player_data.csv')
-#     request = request.select('name')
-#     request = request.where('year_start', '1991')
-#     p request.run.count
-# =end
-
-# =begin
-#     # testing insert query
-#     request = MySqliteRequest.new
-#     request = request.insert('nba_player_data_test.csv')
-#     request = request.values({"name" => "Bud Acton", "year_start" => "1968", "year_end" => "1968", "position" => "F", "height" => "6-6" , "weight" => "210", "birth_date" => "January 11, 1942", "college" => "Hillsdale College"
-# })
-#     request = request.where('year_start', '1991')
-#     request = 
-#     request.run
-# =end
-
-#     # testing delete query
-#     request = MySqliteRequest.new
-#     request = request.from('nba_player_data_test.csv')
-#     request = request.delete
-#     request = request.where('college', 'Duke University')
-#     request.run
-
-# end
-
-# _main()
-
-# "name" => "Bud Acton", "year_start" => "1968", "year_end" => "1968", "position" => "F", "height" => "6-6" , "weight" => "210", "birth_date" => "January 11, 1942", "college" => "Hillsdale College"
-
-
-# Example usage:
-# request = MySqliteRequest.new
-# request = request.from('nba_player_data.csv')
-# puts request
-
-    # request = request.update('nba_player_data_test.csv')
-    # request = request.set({"name" => "Bud Updated", "college" => "Hillsdale College Updated"})
-    # request = request.where('name', 'Bud Acton')
-    # request.run
