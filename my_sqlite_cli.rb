@@ -21,7 +21,8 @@ class MySqliteQueryCli
             @from_parts = from_string.split
             parse_where(where_index, query)
         else
-
+            from_string = query.slice(index..)
+            @from_parts = from_string.split
         end
     end
 
