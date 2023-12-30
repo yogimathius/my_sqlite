@@ -94,13 +94,11 @@ class MySqliteRequest
 
   def print_insert_type
     puts "Insert Attributes #{@insert_attributes}"
-    # puts "Where Attributes #{@where_params}"
   end
 
   def print_delete_type
     puts "Where Attributes #{@where_params}"
   end
-
     
   def print_update_type
     puts "Update Set Data #{@update_set_data}"
@@ -114,7 +112,7 @@ class MySqliteRequest
         print_select_type
     elsif @type_of_request == :insert
         print_insert_type
-    elsif (@type_of_request == :delete)
+    elsif @type_of_request == :delete
         print_delete_type
     elsif @type_of_request == :update
         print_update_type
@@ -127,7 +125,7 @@ class MySqliteRequest
         _run_select
     elsif @type_of_request == :insert
         _run_insert
-    elsif (@type_of_request == :delete)
+    elsif @type_of_request == :delete
         _run_delete
     elsif @type_of_request == :update
         _run_update
@@ -161,13 +159,9 @@ class MySqliteRequest
             row[where_attribute[0]] == where_attribute[1]
         end
     end
-    
-    File.open(@table_name, 'w') do |csv_file|
-        csv_file << csv.headers
-        csv.each do |row|
-            csv_file << row
-        end
-    end
+    File.open(@table_name, 'w') { |f| f.puts(csv) }
+  end
+
   def _run_update
     csv = CSV.read(@table_name, headers: true)
     @where_params.each do |where_attribute|
@@ -192,39 +186,39 @@ class MySqliteRequest
   end
 end
 
-def _main()
-=begin
-    # testing select query
-    request = MySqliteRequest.new
+# def _main()
+# =begin
+#     # testing select query
+#     request = MySqliteRequest.new
 
-=begin
-    request = request.from('nba_player_data.csv')
-    request = request.select('name')
-    request = request.where('year_start', '1991')
-    p request.run.count
-=end
+# =begin
+#     request = request.from('nba_player_data.csv')
+#     request = request.select('name')
+#     request = request.where('year_start', '1991')
+#     p request.run.count
+# =end
 
-=begin
-    # testing insert query
-    request = MySqliteRequest.new
-    request = request.insert('nba_player_data_test.csv')
-    request = request.values({"name" => "Bud Acton", "year_start" => "1968", "year_end" => "1968", "position" => "F", "height" => "6-6" , "weight" => "210", "birth_date" => "January 11, 1942", "college" => "Hillsdale College"
-})
-    request = request.where('year_start', '1991')
-    request = 
-    request.run
-=end
+# =begin
+#     # testing insert query
+#     request = MySqliteRequest.new
+#     request = request.insert('nba_player_data_test.csv')
+#     request = request.values({"name" => "Bud Acton", "year_start" => "1968", "year_end" => "1968", "position" => "F", "height" => "6-6" , "weight" => "210", "birth_date" => "January 11, 1942", "college" => "Hillsdale College"
+# })
+#     request = request.where('year_start', '1991')
+#     request = 
+#     request.run
+# =end
 
-    # testing delete query
-    request = MySqliteRequest.new
-    request = request.from('nba_player_data_test.csv')
-    request = request.delete
-    request = request.where('college', 'Duke University')
-    request.run
+#     # testing delete query
+#     request = MySqliteRequest.new
+#     request = request.from('nba_player_data_test.csv')
+#     request = request.delete
+#     request = request.where('college', 'Duke University')
+#     request.run
 
-end
+# end
 
-_main()
+# _main()
 
 # "name" => "Bud Acton", "year_start" => "1968", "year_end" => "1968", "position" => "F", "height" => "6-6" , "weight" => "210", "birth_date" => "January 11, 1942", "college" => "Hillsdale College"
 
@@ -234,10 +228,7 @@ _main()
 # request = request.from('nba_player_data.csv')
 # puts request
 
-    request = request.update('nba_player_data_test.csv')
-    request = request.set({"name" => "Bud Updated", "college" => "Hillsdale College Updated"})
-    request = request.where('name', 'Bud Acton')
-    request.run
-end
-
-_main()
+    # request = request.update('nba_player_data_test.csv')
+    # request = request.set({"name" => "Bud Updated", "college" => "Hillsdale College Updated"})
+    # request = request.where('name', 'Bud Acton')
+    # request.run
