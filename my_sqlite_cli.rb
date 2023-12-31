@@ -19,7 +19,7 @@ class MySqliteQueryCli
     def parse_where(index, string)
         where_string = string.slice(index + 6..)
         where_parts = where_string.split
-        range = 1..where_parts.size
+        range = 2..where_parts.size
         where_value = where_parts[range].join(" ")
         @request = @request.where(where_parts[0], where_value)
     end
@@ -33,9 +33,8 @@ class MySqliteQueryCli
 
     def parse_set(index, string)
         set_string = string.slice()
-        where_parts = where_string.split
-        range = 1..where_parts.size
-        where_value = where_parts[range].join(" ")
+        set_parts = set_string.split
+        range = 1..set_parts.size
         @request = @request.where(where_parts[0], where_value)
     end
 
