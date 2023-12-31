@@ -28,16 +28,29 @@ class MySqliteQueryCli
         hash = {}
         i = 1
 
-        while i < parts.length
+        while i < parts.length - 2
+            count = 0
+            puts "Line 33, i = #{i}"
             if parts[i + 1] == "="
-                hash[parts[i]] = parts[i + 2]
+                j = 3
+                while i + j < parts.length && parts[i + j] != ","
+                    count += 1
+                    j += 1
+                end
+                range = i + 2..i + 2 + count
+                set_value = parts[range].join(" ")
+                hash[parts[i]] = set_value
                 i += 3
             else
-                i == 1
+                i += 1
             end
         end
 
         return hash
+    end
+
+    def char_replacer(word, subs)
+        word.chars.map { |c| subs.key?(c) ? subs[c] : c }.join
     end
 
     def parse_values(index, string)
@@ -57,7 +70,10 @@ class MySqliteQueryCli
             from_string = string.slice(index..)
         end
 
-        set_hash = create_hash(set_string)
+        comma_sub = { ',' => ' ,'}
+        modified_string = char_replacer(set_string, comma_sub)
+        puts "mod string = #{modified_string}"
+        set_hash = create_hash(modified_string)
         @request = @request.set(set_hash)
     end
 
@@ -94,7 +110,7 @@ class MySqliteQueryCli
 
     def parse(buf)
         @request = MySqliteRequest.new
-        modified_buf = buf.delete("(),;'") # remove punctuation
+        modified_buf = buf.delete("();'") # remove punctuation
         p modified_buf
 
         if modified_buf.include?("SELECT")
