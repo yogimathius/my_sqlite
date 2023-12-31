@@ -19,7 +19,9 @@ class MySqliteQueryCli
     def parse_where(index, string)
         where_string = string.slice(index + 6..)
         where_parts = where_string.split
-        @request = @request.where(where_parts[0], where_parts[2])
+        range = 2..where_parts.size
+        where_value = where_parts[range].join(" ")
+        @request = @request.where(where_parts[0], where_value)
     end
 
     def parse_values(index, string)
