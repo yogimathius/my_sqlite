@@ -59,7 +59,26 @@ class MySqliteRequestTest < Test::Unit::TestCase
     assert_equal(expected_result, result)
   end
 
+  def test_select_joins_query_no_where_clause
+    File.write('joins_data.csv', "person_id,pet_name,pet_age,pet_type\n1,Woof,2,dog\n2,Kitty,7,tiger\n3,Smokey,15,bear\n")
+    query = @request
+        .from('test_data.csv')
+        .select(['name', 'age', 'pet_name', 'pet_type'])
+        .join('joins_data.csv', 'id', 'person_id')
+
+    result = query.run
+
+    expected_result = [
+        {'name' => 'John', 'age' => '25', 'pet_name' => 'Woof', 'pet_type' => 'dog'},
+        {'name' => 'Jane', 'age' => '30', 'pet_name' => 'Kitty', 'pet_type' => 'tiger'},
+        {'name' => 'Bob', 'age' => '22', 'pet_name' => 'Smokey', 'pet_type' => 'bear'},
+    ]
+    assert_equal(expected_result, result)
+  end
+
+
   def teardown
     File.delete('test_data.csv') if File.exist?('test_data.csv')
+    File.delete('joins_data.csv') if File.exist?('joins_data.csv')
   end
 end
