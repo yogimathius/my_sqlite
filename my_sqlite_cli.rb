@@ -36,7 +36,7 @@ class MySqliteQueryCli
                 i == 1
             end
         end
-        
+
         hash_string = hash.to_s
     end
 
@@ -80,11 +80,10 @@ class MySqliteQueryCli
 
     def parse_update(string)
         set_index = string.index(" SET")
-        insert_string = string.slice(0, values_index)
+        insert_string = string.slice(0, set_index)
         insert_into = insert_string.split
         @request = @request.insert(insert_into[2])
-        parse_values(values_index, string)
-        # puts "insert_parts = #{insert_parts}"
+        parse_set(set_index, string)
     end
 
     def parse_delete(string)
