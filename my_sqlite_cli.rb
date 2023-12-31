@@ -34,8 +34,21 @@ class MySqliteQueryCli
     def parse_set(index, string)
         set_string = string.slice()
         set_parts = set_string.split
-        range = 1..set_parts.size
-        @request = @request.where(where_parts[0], where_value)
+        # range = 1..set_parts.size
+        hash = {}
+        i = 1
+
+        while i < set_parts.length
+            if set_parts[i + 1] == "="
+                hash[set_parts[i]] = set_parts[i + 2]
+                i += 3
+            else
+                i == 1
+            end
+        end
+
+        hash_string = hash.to_s
+        @request = @request.set(hash_string)
     end
 
     def parse_select(string)
@@ -68,10 +81,10 @@ class MySqliteQueryCli
 
         if modified_buf.include?("SELECT")
             parse_select(modified_buf)
-        elsif modified_buf.include?("INSERT")
-            parse_insert(modified_buf)
-        # elsif modified_buf.include?("UPDATE")
-        #     parse_update(modified_buf)
+        # elsif modified_buf.include?("INSERT")
+        #     parse_insert(modified_buf)
+        elsif modified_buf.include?("UPDATE")
+            parse_update(modified_buf)
         elsif modified_buf.include?("DELETE")
             parse_delete(modified_buf)
         end
