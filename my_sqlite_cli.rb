@@ -7,12 +7,11 @@ class MySqliteQueryCli
         if where_index
             from_length = where_index - index
             from_string = string.slice(index, from_length)
-            from_parts = from_string.split
             parse_where(where_index, string)
         else
             from_string = string.slice(index..)
-            from_parts = from_string.split
         end
+        from_parts = from_string.split
         @request = @request.from(from_parts[1])
     end
 
@@ -24,6 +23,23 @@ class MySqliteQueryCli
         @request = @request.where(where_parts[0], where_value)
     end
 
+    def create_hash(string)
+        parts = string.split
+        hash = {}
+        i = 1
+
+        while i < parts.length
+            if parts[i + 1] == "="
+                hash[parts[i]] = parts[i + 2]
+                i += 3
+            else
+                i == 1
+            end
+        end
+        
+        hash_string = hash.to_s
+    end
+
     def parse_values(index, string)
         value_string = string.slice(values_index..)
         value_parts = value_string.split
@@ -32,23 +48,17 @@ class MySqliteQueryCli
     end
 
     def parse_set(index, string)
-        set_string = string.slice()
-        set_parts = set_string.split
-        # range = 1..set_parts.size
-        hash = {}
-        i = 1
-
-        while i < set_parts.length
-            if set_parts[i + 1] == "="
-                hash[set_parts[i]] = set_parts[i + 2]
-                i += 3
-            else
-                i == 1
-            end
+        where_index = string.index("WHERE")
+        if where_index
+            set_length = where_index - index
+            set_string = string.slice(index, set_length)
+            parse_where(where_index, string)
+        else
+            from_string = string.slice(index..)
         end
 
-        hash_string = hash.to_s
-        @request = @request.set(hash_string)
+        set_hash = create_hash(set_string)
+        @request = @request.set(set_hash)
     end
 
     def parse_select(string)
@@ -61,6 +71,15 @@ class MySqliteQueryCli
 
     def parse_insert(string)
         values_index = string.index(" VALUES")
+        insert_string = string.slice(0, values_index)
+        insert_into = insert_string.split
+        @request = @request.insert(insert_into[2])
+        parse_values(values_index, string)
+        # puts "insert_parts = #{insert_parts}"
+    end
+
+    def parse_update(string)
+        set_index = string.index(" SET")
         insert_string = string.slice(0, values_index)
         insert_into = insert_string.split
         @request = @request.insert(insert_into[2])
