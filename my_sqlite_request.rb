@@ -204,7 +204,7 @@ class MySqliteRequest
   end
 end
 
-request = MySqliteRequest.new
+# request = MySqliteRequest.new
 
 # ===== testing select query =====
 # request = request.from('nba_player_data.csv')
@@ -213,14 +213,14 @@ request = MySqliteRequest.new
 # p request.run
 
 # ===== testing select with join query =====
-request = request
-    .from('nba_player_data_light.csv')
-    .select(['name', 'weight', 'collage', 'birth_city'])
-    .join('nba_players_light.csv', 'name', 'player')
+# request = request
+#     .from('nba_player_data_light.csv')
+#     .select(['name', 'weight', 'collage', 'birth_city'])
+#     .join('nba_players_light.csv', 'name', 'player')
 
-request.run.each do |player|
-    p player
-end
+# request.run.each do |player|
+#     p player
+# end
 
 # ===== testing insert query ======
 # request = request.insert('nba_player_data_light.csv')
