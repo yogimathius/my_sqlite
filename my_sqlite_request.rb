@@ -16,7 +16,7 @@ class MySqliteRequest
     @type_of_request    = :none
     @select_columns     = []
     @where_params       = []
-    @join_attributes    = []
+    @join_attributes    = {}
     @insert_attributes  = []
     @update_attributes  = []
     @table_name         = nil
@@ -43,8 +43,12 @@ class MySqliteRequest
     self
   end
 
-  def join(column_on_db_a, filename_db_b, column_on_db_b)
-    @join_attributes = [column_on_db_a, filename_db_b, column_on_db_b]
+  def join(filename_db_b, column_on_db_a,  column_on_db_b)
+    @join_attributes = {
+        filename_db_b: filename_db_b,
+        column_on_db_a: column_on_db_a,
+        column_on_db_b: column_on_db_b
+    }
     self
   end
 
@@ -135,6 +139,8 @@ class MySqliteRequest
   def _run_select
     result = []
     CSV.parse(File.read(@table_name), headers: true).each do |row|
+        _run_join(row) unless @join_attributes.empty?
+
         if @where_params.any?
             @where_params.each do |where_attribute|
                 if row[where_attribute[0]] == where_attribute[1]
@@ -179,6 +185,16 @@ class MySqliteRequest
     File.open(@table_name, 'w') { |f| f.puts(csv) }
   end
 
+  def _run_join(row)
+    CSV.parse(File.read(@join_attributes[:filename_db_b]), headers: true).each do |join_row|
+        if row[@join_attributes[:column_on_db_a]] == join_row[@join_attributes[:column_on_db_b]]
+            join_row.each do |key_value|
+                row.push(key_value)
+            end
+        end
+    end
+  end
+
   def _setTypeOfRequest(new_type)
     if (@type_of_request == :none or @type_of_request == new_type)
         @type_of_request = new_type
@@ -197,7 +213,7 @@ end
 # p request.run
 
 # ===== testing insert query ======
-# request = request.insert('nba_player_data_test.csv')
+# request = request.insert('nba_player_data_light.csv')
 # request = request.values({
 #     "name" => "Bud Acton",
 #     "year_start" => "1968",
@@ -213,14 +229,14 @@ end
 # request.run
 
 # ===== testing update query =====
-# request = request.update('nba_player_data_test.csv')
+# request = request.update('nba_player_data_light.csv')
 # request = request.set({"name" => "Bud Updated", "college" => "Hillsdale College Updated"})
 # request = request.where('name', 'Bud Acton')
 # request.run
 
 # ===== testing delete query =====
 # request = MySqliteRequest.new
-# request = request.from('nba_player_data_test.csv')
+# request = request.from('nba_player_data_light.csv')
 # request = request.delete
 # request = request.where('college', 'Hillsdale College Updated')
 # request.run
