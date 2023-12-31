@@ -76,7 +76,6 @@ class MySqliteQueryCli
         while buf = Readline.readline("my_sqlite_cli > ", true)
             instance_of_request = parse(buf)
             instance_of_request.run
-            # clear @request ?
         end
 
     end
