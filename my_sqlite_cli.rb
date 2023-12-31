@@ -19,7 +19,7 @@ class MySqliteQueryCli
     def parse_where(index, string)
         where_string = string.slice(index + 6..)
         where_parts = where_string.split
-        range = 2..where_parts.size
+        range = 1..where_parts.size
         where_value = where_parts[range].join(" ")
         @request = @request.where(where_parts[0], where_value)
     end
@@ -45,22 +45,28 @@ class MySqliteQueryCli
         insert_into = insert_string.split
         @request = @request.insert(insert_into[2])
         parse_values(values_index, string)
-        puts "insert_parts = #{insert_parts}"
+        # puts "insert_parts = #{insert_parts}"
+    end
+
+    def parse_delete(string)
+        from_index = string.index(" FROM")
+        parse_from(from_index, string)
+        @request = @request.delete()
     end
 
     def parse(buf)
         @request = MySqliteRequest.new
-        modified_buf = buf.delete("(),;'")
+        modified_buf = buf.delete("(),;'=") # remove punctuation
         p modified_buf
 
         if modified_buf.include?("SELECT")
             parse_select(modified_buf)
-        elsif buf.include?("INSERT")
+        elsif modified_buf.include?("INSERT")
             parse_insert(modified_buf)
         # elsif modified_buf.include?("UPDATE")
         #     parse_update(modified_buf)
-        # elsif modified_buf.include?("DELETE")
-        #     parse_delete(buf)
+        elsif modified_buf.include?("DELETE")
+            parse_delete(modified_buf)
         end
 
         return @request
