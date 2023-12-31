@@ -31,6 +31,14 @@ class MySqliteQueryCli
         # @request = @request.values()
     end
 
+    def parse_set(index, string)
+        set_string = string.slice()
+        where_parts = where_string.split
+        range = 1..where_parts.size
+        where_value = where_parts[range].join(" ")
+        @request = @request.where(where_parts[0], where_value)
+    end
+
     def parse_select(string)
         from_index = string.index(" FROM")
         select_string = string.slice(7, from_index - 7)
@@ -56,7 +64,7 @@ class MySqliteQueryCli
 
     def parse(buf)
         @request = MySqliteRequest.new
-        modified_buf = buf.delete("(),;'=") # remove punctuation
+        modified_buf = buf.delete("(),;'") # remove punctuation
         p modified_buf
 
         if modified_buf.include?("SELECT")
