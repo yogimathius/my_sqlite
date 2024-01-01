@@ -23,32 +23,6 @@ class MySqliteQueryCli
                 .where(where_key, where_value) unless where_parts.empty?
     end
 
-    def create_hash(string)
-        parts = string.split
-        hash = {}
-        i = 1
-
-        while i < parts.length - 2
-            count = 0
-            puts "Line 33, i = #{i}"
-            if parts[i + 1] == "="
-                j = 3
-                while i + j < parts.length && parts[i + j] != ","
-                    count += 1
-                    j += 1
-                end
-                range = i + 2..i + 2 + count
-                set_value = parts[range].join(" ")
-                hash[parts[i]] = set_value
-                i += 3
-            else
-                i += 1
-            end
-        end
-
-        return hash
-    end
-
     def char_replacer(word, subs)
         word.chars.map { |c| subs.key?(c) ? subs[c] : c }.join
     end
@@ -60,23 +34,22 @@ class MySqliteQueryCli
         # @request = @request.values()
     end
 
-    def parse_set(index, string)
-        where_index = string.index("WHERE")
-        if where_index
-            set_length = where_index - index
-            set_string = string.slice(index, set_length)
-            parse_where(where_index, string)
-        else
-            from_string = string.slice(index..)
-        end
+    def build_update(string)
+        update_clause, remaining_clause = string.split(" SET ")
+        update_from = update_clause.split(" ")[1]
+        set_clause, where_clause = remaining_clause.split(" WHERE ")
+        set_hash = set_clause.split(",").map do |part|
+            part = part.split(' = ')
+            [part[0].strip, part[1].gsub("'", '').strip] 
+        end.to_h
 
-        comma_sub = { ',' => ' ,'}
-        modified_string = char_replacer(set_string, comma_sub)
-        puts "mod string = #{modified_string}"
-        set_hash = create_hash(modified_string)
-        @request = @request.set(set_hash)
+        where_parts = where_clause.split(" = ")
+
+        @request.update(update_from)
+                .set(set_hash)
+                .where(where_parts[0], where_parts[1])
     end
-
+    
     def parse_insert(string)
         values_index = string.index(" VALUES")
         insert_string = string.slice(0, values_index)
@@ -84,14 +57,6 @@ class MySqliteQueryCli
         @request = @request.insert(insert_into[2])
         parse_values(values_index, string)
         # puts "insert_parts = #{insert_parts}"
-    end
-
-    def parse_update(string)
-        set_index = string.index(" SET")
-        update_string = string.slice(0, set_index)
-        update_parts = update_string.split
-        @request = @request.update(update_parts[1])
-        parse_set(set_index, string)
     end
 
     def parse_delete(string)
@@ -109,7 +74,7 @@ class MySqliteQueryCli
         # elsif modified_buf.include?("INSERT")
         #     parse_insert(modified_buf)
         elsif modified_buf.include?("UPDATE")
-            parse_update(modified_buf)
+            build_update(modified_buf)
         elsif modified_buf.include?("DELETE")
             parse_delete(modified_buf)
         end
@@ -131,3 +96,6 @@ end
 # end
     
 # _main()
+
+
+# UPDATE nba_player_data_light.csv SET name = 'Bud Acton' WHERE name = 'Bud Updated';
