@@ -25,10 +25,12 @@ class TestMySqliteQueryCli < Test::Unit::TestCase
     assert_equal([["name", "'John Doe'"]], result.instance_variable_get(:@where_params))
   end
 
-#   def test_parse_insert
-#     query = "INSERT INTO nba_player_data_light.csv (column1, column2) VALUES (value1, value2);"
-#     @cli.parse_insert(query)
-#     assert_equal(["INSERT", "INTO", "table", "(column1,", "column2)"], @cli.instance_variable_get(:@insert_parts))
-#     assert_equal(["VALUES", "value1", "value2"], @cli.instance_variable_get(:@insert_values))
-#   end
+  def test_build_insert
+    query = "INSERT INTO test_data.csv VALUES (value1, value2, value3);"
+    result = @cli.build_insert(query)
+    assert_equal(:delete, result.instance_variable_get(:@type_of_request))
+    assert_equal("test_data.csv", result.instance_variable_get(:@table_name))
+    assert_equal(["VALUES", "value1", "value2", "value3"], result.instance_variable_get(:@insert_attributes))
+  end
+
 end

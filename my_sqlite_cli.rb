@@ -10,9 +10,9 @@ class MySqliteQueryCli
         remaining_clause, where_clause = string.split("SELECT ")[1].split(" WHERE ")
 
         select_clause, from_table = remaining_clause.split("FROM ")
-        p from_table
+        # p from_table
         select_columns = select_clause.split(/[,\s]+/)
-        p select_columns
+        # p select_columns
         where_parts = where_clause.split(" = ")
 
         where_key = where_parts[0] || nil
