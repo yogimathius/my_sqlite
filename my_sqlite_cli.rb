@@ -26,7 +26,7 @@ class MySqliteQueryCli
     def build_insert(string)
         insert_clause, remaining_clause = string.split(" VALUES ")
         insert_into = insert_clause.split("INTO ")[1]
-        values = remaining_clause.split(",")
+        values = remaining_clause.split(",").map(&:strip)
         @request.insert(insert_into)
                 .values(values)
     end
@@ -36,8 +36,8 @@ class MySqliteQueryCli
         update_from = update_clause.split(" ")[1]
         set_clause, where_clause = remaining_clause.split(" WHERE ")
         set_hash = set_clause.split(",").map do |part|
-            part = part.split(' = ')
-            # [part[0].strip, part[1].gsub("'", '').strip]      # already stripped in parse()
+            key, value = part.split('=').map(&:strip)
+            [key, value]
         end.to_h
 
         where_parts = where_clause.split(" = ")
@@ -55,7 +55,7 @@ class MySqliteQueryCli
         where_value = where_parts[1] || nil
 
         @request.delete()
-                .from()
+                .from(delete_from)
                 .where(where_key, where_value) unless where_parts.empty?
     end
 
@@ -64,15 +64,16 @@ class MySqliteQueryCli
         p modified_buf
 
         if modified_buf.include?("SELECT")
-            build_select(modified_buf)
+            result = build_select(modified_buf)
         elsif modified_buf.include?("INSERT")
-            build_insert(modified_buf)
+            result = build_insert(modified_buf)
         elsif modified_buf.include?("UPDATE")
-            build_update(modified_buf)
+            result = build_update(modified_buf)
         elsif modified_buf.include?("DELETE")
-            build_delete(modified_buf)
+            result = build_delete(modified_buf)
         end
-
+        
+        result
     end
 
     def run!
