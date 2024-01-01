@@ -151,7 +151,7 @@ class MySqliteRequest
             result << row.to_hash.slice(*@select_columns)
         end
     end
-    puts result
+    result
   end
 
   def _run_insert

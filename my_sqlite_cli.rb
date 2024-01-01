@@ -2,55 +2,25 @@ require "readline"
 require_relative "my_sqlite_request"
 
 class MySqliteQueryCli
-    def parse_from(index, string)
-        where_index = string.index("WHERE")
-        if where_index
-            from_length = where_index - index
-            from_string = string.slice(index, from_length)
-            parse_where(where_index, string)
-        else
-            from_string = string.slice(index..)
-        end
-        from_parts = from_string.split
-        @request = @request.from(from_parts[1])
+    def initialize
+        @request = MySqliteRequest.new
     end
 
-    def parse_where(index, string)
-        where_string = string.slice(index + 6..)
-        where_parts = where_string.split
-        range = 2..where_parts.size
-        where_value = where_parts[range].join(" ")
-        @request = @request.where(where_parts[0], where_value)
-    end
+    def build_select(string)
+        remaining_clause, where_clause = string.split("SELECT ")[1].split(" WHERE ")
 
-    def create_hash(string)
-        parts = string.split
-        hash = {}
-        i = 1
+        select_clause, from_table = remaining_clause.split("FROM ")
+        p from_table
+        select_columns = select_clause.split(/[,\s]+/)
+        p select_columns
+        where_parts = where_clause.split(" = ")
 
-        while i < parts.length - 2
-            count = 0
-            puts "Line 33, i = #{i}"
-            if parts[i + 1] == "="
-                j = 3
-                while i + j < parts.length && parts[i + j] != ","
-                    count += 1
-                    j += 1
-                end
-                range = i + 2..i + 2 + count
-                set_value = parts[range].join(" ")
-                hash[parts[i]] = set_value
-                i += 3
-            else
-                i += 1
-            end
-        end
-
-        return hash
-    end
-
-    def char_replacer(word, subs)
-        word.chars.map { |c| subs.key?(c) ? subs[c] : c }.join
+        where_key = where_parts[0] || nil
+        where_value = where_parts[1] || nil
+        
+        @request.select(select_columns)
+                .from(from_table)
+                .where(where_key, where_value) unless where_parts.empty?
     end
 
     def parse_values(index, string)
@@ -60,31 +30,22 @@ class MySqliteQueryCli
         # @request = @request.values()
     end
 
-    def parse_set(index, string)
-        where_index = string.index("WHERE")
-        if where_index
-            set_length = where_index - index
-            set_string = string.slice(index, set_length)
-            parse_where(where_index, string)
-        else
-            from_string = string.slice(index..)
-        end
+    def build_update(string)
+        update_clause, remaining_clause = string.split(" SET ")
+        update_from = update_clause.split(" ")[1]
+        set_clause, where_clause = remaining_clause.split(" WHERE ")
+        set_hash = set_clause.split(",").map do |part|
+            part = part.split(' = ')
+            [part[0].strip, part[1].gsub("'", '').strip] 
+        end.to_h
 
-        comma_sub = { ',' => ' ,'}
-        modified_string = char_replacer(set_string, comma_sub)
-        puts "mod string = #{modified_string}"
-        set_hash = create_hash(modified_string)
-        @request = @request.set(set_hash)
+        where_parts = where_clause.split(" = ")
+
+        @request.update(update_from)
+                .set(set_hash)
+                .where(where_parts[0], where_parts[1])
     end
-
-    def parse_select(string)
-        from_index = string.index(" FROM")
-        select_string = string.slice(7, from_index - 7)
-        select_parts = select_string.split
-        @request = @request.select(select_parts)
-        parse_from(from_index, string)
-    end
-
+    
     def parse_insert(string)
         values_index = string.index(" VALUES")
         insert_string = string.slice(0, values_index)
@@ -94,14 +55,6 @@ class MySqliteQueryCli
         # puts "insert_parts = #{insert_parts}"
     end
 
-    def parse_update(string)
-        set_index = string.index(" SET")
-        update_string = string.slice(0, set_index)
-        update_parts = update_string.split
-        @request = @request.update(update_parts[1])
-        parse_set(set_index, string)
-    end
-
     def parse_delete(string)
         from_index = string.index(" FROM")
         parse_from(from_index, string)
@@ -109,35 +62,36 @@ class MySqliteQueryCli
     end
 
     def parse(buf)
-        @request = MySqliteRequest.new
         modified_buf = buf.delete("();'") # remove punctuation
         p modified_buf
 
         if modified_buf.include?("SELECT")
-            parse_select(modified_buf)
+            build_select(modified_buf)
         # elsif modified_buf.include?("INSERT")
         #     parse_insert(modified_buf)
         elsif modified_buf.include?("UPDATE")
-            parse_update(modified_buf)
+            build_update(modified_buf)
         elsif modified_buf.include?("DELETE")
             parse_delete(modified_buf)
         end
 
-        return @request
     end
 
     def run!
         while buf = Readline.readline("my_sqlite_cli > ", true)
-            instance_of_request = parse(buf)
-            instance_of_request.run
+            parse(buf)
+            @request.run
         end
 
     end
 end
 
-def _main()
-    mysqcli = MySqliteQueryCli.new
-    mysqcli.run!
-end
+# def _main()
+#     mysqcli = MySqliteQueryCli.new
+#     mysqcli.run!
+# end
     
-_main()
+# _main()
+
+
+# UPDATE nba_player_data_light.csv SET name = 'Bud Acton' WHERE name = 'Bud Updated';
