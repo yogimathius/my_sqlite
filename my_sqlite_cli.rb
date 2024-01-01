@@ -52,10 +52,16 @@ class MySqliteQueryCli
                 .where(where_parts[0], where_parts[1])
     end
 
-    def parse_delete(string)
-        from_index = string.index(" FROM")
-        parse_from(from_index, string)
-        @request = @request.delete()
+    def build_delete(string)
+        delete_from, where_clause = string.split("FROM ")[1].split(" WHERE ")
+        where_parts = where_clause.split(" = ")
+
+        where_key = where_parts[0] || nil
+        where_value = where_parts[1] || nil
+
+        @request.delete()
+                .from()
+                .where(where_key, where_value) unless where_parts.empty?
     end
 
     def parse(buf)
