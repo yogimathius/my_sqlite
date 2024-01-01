@@ -6,6 +6,13 @@ class MySqliteQueryCli
         @request = MySqliteRequest.new
     end
 
+    def build_where(string)
+        where_parts = string.split(" = ")
+        where_key = where_parts[0] || nil
+        where_value = where_parts[1] || nil
+        @request.where(where_key, where_value) unless where_parts.empty?
+    end
+
     def build_select(string)
         remaining_clause, where_clause = string.split("SELECT ")[1].split(" WHERE ")
 
@@ -13,10 +20,7 @@ class MySqliteQueryCli
         select_columns = select_clause.split(/[,\s]+/)
 
         if where_clause
-            where_parts = where_clause.split(" = ")
-            where_key = where_parts[0] || nil
-            where_value = where_parts[1] || nil
-            @request.where(where_key, where_value) unless where_parts.empty?
+            build_where(where_clause)
         end
 
         @request.select(select_columns)
@@ -40,21 +44,19 @@ class MySqliteQueryCli
             [key, value]
         end.to_h
 
-        where_parts = where_clause.split(" = ")
+        if where_clause
+            build_where(where_clause)
+        end
 
         @request.update(update_from)
                 .set(set_hash)
-                .where(where_parts[0], where_parts[1])
     end
 
     def build_delete(string)
         delete_from, where_clause = string.split("FROM ")[1].split(" WHERE ")
         
         if where_clause
-            where_parts = where_clause.split(" = ")
-            where_key = where_parts[0] || nil
-            where_value = where_parts[1] || nil
-            @request.where(where_key, where_value) unless where_parts.empty?
+            build_where(where_clause)
         end
 
         @request.delete()
