@@ -80,7 +80,7 @@ class MySqliteQueryCli
     def parse_select(string)
         from_index = string.index(" FROM")
         select_string = string.slice(7, from_index - 7)
-        select_parts = select_string.split
+        select_parts = select_string.split(", ")
         @request = @request.select(select_parts)
         parse_from(from_index, string)
     end
