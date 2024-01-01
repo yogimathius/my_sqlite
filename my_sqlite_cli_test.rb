@@ -28,9 +28,17 @@ class TestMySqliteQueryCli < Test::Unit::TestCase
   def test_build_insert
     query = "INSERT INTO test_data.csv VALUES (value1, value2, value3);"
     result = @cli.build_insert(query)
-    assert_equal(:delete, result.instance_variable_get(:@type_of_request))
+    assert_equal(:insert, result.instance_variable_get(:@type_of_request))
     assert_equal("test_data.csv", result.instance_variable_get(:@table_name))
     assert_equal(["VALUES", "value1", "value2", "value3"], result.instance_variable_get(:@insert_attributes))
+  end
+
+  def test_build_delete
+    query = "DELETE FROM test_data.csv WHERE name = 'John Doe';"
+    result = @cli.build_delete(query)
+    assert_equal(:delete, result.instance_variable_get(:@type_of_request))
+    assert_equal("test_data.csv", result.instance_variable_get(:@table_name))
+    assert_equal([["name", "'John Doe'"]], result.instance_variable_get(:@where_params))
   end
 
 end
