@@ -122,7 +122,7 @@ class MySqliteRequest
   end
 
   def run
-    print
+    # print
     if @type_of_request == :select
         _run_select
     elsif @type_of_request == :insert
@@ -151,7 +151,7 @@ class MySqliteRequest
             result << row.to_hash.slice(*@select_columns)
         end
     end
-    result
+    puts result # TODO print the result to STDOUT for CLI, but result still needs to be formatted correctly
   end
 
   def _run_insert
