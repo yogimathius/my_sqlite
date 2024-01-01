@@ -27,13 +27,8 @@ class MySqliteQueryCli
         insert_clause, remaining_clause = string.split(" VALUES ")
         insert_into = insert_clause.split("INTO ")[1]
         values = remaining_clause.split(",")
-        # set_hash = set_clause.split(",").map do |part|
-        #     part = part.split(' = ')
-        #     [part[0].strip, part[1].gsub("'", '').strip] 
-        end.to_h
-
         @request.insert(insert_into)
-                .values()
+                .values(values)
     end
 
     def build_update(string)
@@ -42,7 +37,7 @@ class MySqliteQueryCli
         set_clause, where_clause = remaining_clause.split(" WHERE ")
         set_hash = set_clause.split(",").map do |part|
             part = part.split(' = ')
-            [part[0].strip, part[1].gsub("'", '').strip] 
+            # [part[0].strip, part[1].gsub("'", '').strip]      # already stripped in parse()
         end.to_h
 
         where_parts = where_clause.split(" = ")
@@ -95,6 +90,3 @@ end
 # end
     
 # _main()
-
-
-# UPDATE nba_player_data_light.csv SET name = 'Bud Acton' WHERE name = 'Bud Updated';
