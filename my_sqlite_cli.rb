@@ -23,10 +23,6 @@ class MySqliteQueryCli
                 .where(where_key, where_value) unless where_parts.empty?
     end
 
-    def char_replacer(word, subs)
-        word.chars.map { |c| subs.key?(c) ? subs[c] : c }.join
-    end
-
     def parse_values(index, string)
         value_string = string.slice(values_index..)
         value_parts = value_string.split
