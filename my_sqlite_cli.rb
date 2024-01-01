@@ -2,25 +2,25 @@ require "readline"
 require_relative "my_sqlite_request"
 
 class MySqliteQueryCli
-    def parse_from(index, string)
-        where_index = string.index("WHERE")
-        if where_index
-            from_length = where_index - index
-            from_string = string.slice(index, from_length)
-            parse_where(where_index, string)
-        else
-            from_string = string.slice(index..)
-        end
-        from_parts = from_string.split
-        @request = @request.from(from_parts[1])
+    def initialize
+        @request = MySqliteRequest.new
     end
 
-    def parse_where(index, string)
-        where_string = string.slice(index + 6..)
-        where_parts = where_string.split
-        range = 2..where_parts.size
-        where_value = where_parts[range].join(" ")
-        @request = @request.where(where_parts[0], where_value)
+    def build_select(string)
+        remaining_clause, where_clause = string.split("SELECT ")[1].split(" WHERE ")
+
+        select_clause, from_table = remaining_clause.split("FROM ")
+        p from_table
+        select_columns = select_clause.split(/[,\s]+/)
+        p select_columns
+        where_parts = where_clause.split(" = ")
+
+        where_key = where_parts[0] || nil
+        where_value = where_parts[1] || nil
+        
+        @request.select(select_columns)
+                .from(from_table)
+                .where(where_key, where_value) unless where_parts.empty?
     end
 
     def create_hash(string)
@@ -77,14 +77,6 @@ class MySqliteQueryCli
         @request = @request.set(set_hash)
     end
 
-    def parse_select(string)
-        from_index = string.index(" FROM")
-        select_string = string.slice(7, from_index - 7)
-        select_parts = select_string.split(", ")
-        @request = @request.select(select_parts)
-        parse_from(from_index, string)
-    end
-
     def parse_insert(string)
         values_index = string.index(" VALUES")
         insert_string = string.slice(0, values_index)
@@ -109,12 +101,11 @@ class MySqliteQueryCli
     end
 
     def parse(buf)
-        @request = MySqliteRequest.new
         modified_buf = buf.delete("();'") # remove punctuation
         p modified_buf
 
         if modified_buf.include?("SELECT")
-            parse_select(modified_buf)
+            build_select(modified_buf)
         # elsif modified_buf.include?("INSERT")
         #     parse_insert(modified_buf)
         elsif modified_buf.include?("UPDATE")
@@ -123,21 +114,20 @@ class MySqliteQueryCli
             parse_delete(modified_buf)
         end
 
-        return @request
     end
 
     def run!
         while buf = Readline.readline("my_sqlite_cli > ", true)
-            instance_of_request = parse(buf)
-            instance_of_request.run
+            parse(buf)
+            @request.run
         end
 
     end
 end
 
-def _main()
-    mysqcli = MySqliteQueryCli.new
-    mysqcli.run!
-end
+# def _main()
+#     mysqcli = MySqliteQueryCli.new
+#     mysqcli.run!
+# end
     
-_main()
+# _main()
