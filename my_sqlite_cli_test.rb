@@ -41,4 +41,8 @@ class TestMySqliteQueryCli < Test::Unit::TestCase
     assert_equal([["name", "John Doe"]], result.instance_variable_get(:@where_params))
   end
 
+  def teardown
+    File.delete('test_data.csv') if File.exist?('test_data.csv')
+    # File.delete('joins_data.csv') if File.exist?('joins_data.csv')
+  end
 end
