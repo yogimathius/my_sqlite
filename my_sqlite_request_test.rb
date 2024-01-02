@@ -2,6 +2,7 @@
 
 require 'test/unit'
 require_relative 'my_sqlite_request'
+require 'stringio'
 
 class MySqliteRequestTest < Test::Unit::TestCase
   def setup
@@ -11,18 +12,24 @@ class MySqliteRequestTest < Test::Unit::TestCase
 
   def test_select_query
     query = @request.from('test_data.csv').select(['name', 'age']).where('id', '2')
+    stdout = $stdout
+    $stdout = StringIO.new
+    
     result = query.run
 
-    expected_result = [{'name' => 'Jane', 'age' => '30'}]
-    assert_equal(expected_result, result)
+    expected_result = "Jane|30\n"
+    assert_equal(expected_result, $stdout.string)
   end
 
   def test_select_query_with_star
     query = @request.from('test_data.csv').select(['*'])
+    stdout = $stdout
+    $stdout = StringIO.new
+    
     result = query.run
 
-    expected_result = "id|1name|Johnage|25\n" + "id|2name|Janeage|30\n" + "id|3name|Bobage|22"
-    assert_equal(expected_result, result)
+    expected_result = "1|John|25\n" + "2|Jane|30\n" + "3|Bob|22\n"
+    assert_equal(expected_result, $stdout.string)
   end
 
   def test_insert_query

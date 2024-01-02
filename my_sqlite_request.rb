@@ -142,9 +142,9 @@ class MySqliteRequest
         _run_join(row) unless @join_attributes.empty?
 
         selected_columns = if @select_columns[0] != "*"
-            row.to_hash.slice(*@select_columns)
+            row.to_hash.slice(*@select_columns).values.join("|")
         else
-            row
+            row.to_s.split(",").join("|")
         end
 
         if @where_params.any?
@@ -157,12 +157,8 @@ class MySqliteRequest
             result << selected_columns
         end
     end
-    result = result.map do |result_row|
-        result_row.map do |field|
-            field.join("|")
-        end.join
-    end.join("\n") # TODO print the result to STDOUT for CLI, but result still needs to be formatted correctly
-    puts result and return result
+
+    puts result.join
   end
 
   def _run_insert
