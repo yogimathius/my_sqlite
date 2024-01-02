@@ -182,16 +182,21 @@ class MySqliteRequest
 
   def _run_update
     csv = CSV.read(@table_name, headers: true)
-    @where_params.each do |where_attribute|
-        csv.find do |row|
-            if row[where_attribute[0]] == where_attribute[1]
-                @update_set_data.keys.each do |update_key|
-                    update_value = @update_set_data[update_key]
-                    row[update_key] = update_value
-                end
+    csv.each do |row|
+        if @where_params.any?
+          @where_params.each do |where_attribute|
+            next unless row[where_attribute[0]] == where_attribute[1]
+      
+            @update_set_data.each do |update_key, update_value|
+              row[update_key] = update_value
             end
+          end
+        else
+          @update_set_data.each do |update_key, update_value|
+            row[update_key] = update_value
+          end
         end
-    end
+      end
     File.open(@table_name, 'w') { |f| f.puts(csv) }
   end
 

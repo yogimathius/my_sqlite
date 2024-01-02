@@ -77,6 +77,21 @@ class MySqliteRequestTest < Test::Unit::TestCase
     assert_equal(expected_result, result)
   end
 
+  def test_update_query_without_where
+    query = @request.update('test_data.csv').set({'name' => 'All Updated'})
+    result = query.run
+
+    result = CSV.read('test_data.csv', headers: true).map(&:to_h)
+
+    expected_result = [
+      {'id' => '1', 'name' => 'All Updated', 'age' => '25'},
+      {'id' => '2', 'name' => 'All Updated', 'age' => '30'},
+      {'id' => '3', 'name' => 'All Updated', 'age' => '22'},
+    ]
+
+    assert_equal(expected_result, result)
+  end
+
   def test_select_joins_query_no_where_clause
     File.write('joins_data.csv', "person_id,pet_name,pet_age,pet_type\n1,Woof,2,dog\n2,Kitty,7,tiger\n3,Smokey,15,bear\n")
     query = @request
