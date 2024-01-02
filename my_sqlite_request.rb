@@ -173,10 +173,9 @@ class MySqliteRequest
 
   def _run_delete
     csv = CSV.read(@table_name, headers: true)
-    @where_params.each do |where_attribute|
-        csv.delete_if do |row|
-            row[where_attribute[0]] == where_attribute[1]
-        end
+    
+    csv.delete_if do |row|
+        @where_params.any? ? @where_params.any? { |where_attribute| row[where_attribute[0]] == where_attribute[1] } : true
     end
     File.open(@table_name, 'w') { |f| f.puts(csv) }
   end
