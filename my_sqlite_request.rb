@@ -144,7 +144,7 @@ class MySqliteRequest
         selected_columns = if @select_columns[0] != "*"
             row.to_hash.slice(*@select_columns).values.join("|")
         else
-            row.to_s.split(",").join("|")
+            row.to_hash.values.join("|")
         end
 
         if @where_params.any?
@@ -158,7 +158,7 @@ class MySqliteRequest
         end
     end
 
-    puts result.join
+    puts result.join("\n")
   end
 
   def _run_insert
