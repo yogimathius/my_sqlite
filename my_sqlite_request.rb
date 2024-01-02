@@ -141,17 +141,28 @@ class MySqliteRequest
     CSV.parse(File.read(@table_name), headers: true).each do |row|
         _run_join(row) unless @join_attributes.empty?
 
+        selected_columns = if @select_columns[0] != "*"
+            row.to_hash.slice(*@select_columns)
+        else
+            row
+        end
+
         if @where_params.any?
             @where_params.each do |where_attribute|
                 if row[where_attribute[0]] == where_attribute[1]
-                    result << row.to_hash.slice(*@select_columns)
+                    result << selected_columns
                 end
             end
         else 
-            result << row.to_hash.slice(*@select_columns)
+            result << selected_columns
         end
     end
-    puts result # TODO print the result to STDOUT for CLI, but result still needs to be formatted correctly
+    result = result.map do |result_row|
+        result_row.map do |field|
+            field.join("|")
+        end.join
+    end.join("\n") # TODO print the result to STDOUT for CLI, but result still needs to be formatted correctly
+    puts result and return result
   end
 
   def _run_insert

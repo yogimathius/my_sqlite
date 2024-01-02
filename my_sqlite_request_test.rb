@@ -17,6 +17,14 @@ class MySqliteRequestTest < Test::Unit::TestCase
     assert_equal(expected_result, result)
   end
 
+  def test_select_query_with_star
+    query = @request.from('test_data.csv').select(['*'])
+    result = query.run
+
+    expected_result = "id|1name|Johnage|25\n" + "id|2name|Janeage|30\n" + "id|3name|Bobage|22"
+    assert_equal(expected_result, result)
+  end
+
   def test_insert_query
     query = @request.insert('test_data.csv').values({'id' => '4', 'name' => 'Alice', 'age' => '28'})
     query.run
