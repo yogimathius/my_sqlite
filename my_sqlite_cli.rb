@@ -19,9 +19,9 @@ class MySqliteQueryCli
         select_clause, from_table = remaining_clause.split("FROM ")
         select_columns = select_clause.split(/[,\s]+/)
 
-        if where_clause
-            build_where(where_clause)
-        end
+        
+        build_where(where_clause) unless where_clause.nil?
+        
 
         @request.select(select_columns)
                 .from(from_table)
@@ -44,9 +44,7 @@ class MySqliteQueryCli
             [key, value]
         end.to_h
 
-        if where_clause
-            build_where(where_clause)
-        end
+        build_where(where_clause) unless where_clause.nil?
 
         @request.update(update_from)
                 .set(set_hash)
@@ -55,9 +53,7 @@ class MySqliteQueryCli
     def build_delete(string)
         delete_from, where_clause = string.split("FROM ")[1].split(" WHERE ")
         
-        if where_clause
-            build_where(where_clause)
-        end
+        build_where(where_clause) unless where_clause.nil?
 
         @request.delete()
                 .from(delete_from)
@@ -89,9 +85,9 @@ class MySqliteQueryCli
     end
 end
 
-def _main()
-    mysqcli = MySqliteQueryCli.new
-    mysqcli.run!
-end
+# def _main()
+#     mysqcli = MySqliteQueryCli.new
+#     mysqcli.run!
+# end
     
-_main()
+# _main()

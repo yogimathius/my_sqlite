@@ -2,6 +2,7 @@
 
 require 'test/unit'
 require_relative 'my_sqlite_request'
+require 'stringio'
 
 class MySqliteRequestTest < Test::Unit::TestCase
   def setup
@@ -11,10 +12,24 @@ class MySqliteRequestTest < Test::Unit::TestCase
 
   def test_select_query
     query = @request.from('test_data.csv').select(['name', 'age']).where('id', '2')
+    stdout = $stdout
+    $stdout = StringIO.new
+    
     result = query.run
 
-    expected_result = [{'name' => 'Jane', 'age' => '30'}]
-    assert_equal(expected_result, result)
+    expected_result = "Jane|30\n"
+    assert_equal(expected_result, $stdout.string)
+  end
+
+  def test_select_query_with_star
+    query = @request.from('test_data.csv').select(['*'])
+    stdout = $stdout
+    $stdout = StringIO.new
+    
+    result = query.run
+
+    expected_result = "1|John|25\n" + "2|Jane|30\n" + "3|Bob|22\n"
+    assert_equal(expected_result, $stdout.string)
   end
 
   def test_insert_query
@@ -44,6 +59,16 @@ class MySqliteRequestTest < Test::Unit::TestCase
     assert_equal(expected_result, result)
   end
 
+  def test_delete_query_without_where
+    query = @request.from('test_data.csv').delete
+    result = query.run
+
+    result = CSV.read('test_data.csv', headers: true).map(&:to_h)
+
+    expected_result = []
+    assert_equal(expected_result, result)
+  end
+
   def test_update_query
     query = @request.update('test_data.csv').set({'name' => 'Jane Updated'}).where('id', '2')
     result = query.run
@@ -54,6 +79,21 @@ class MySqliteRequestTest < Test::Unit::TestCase
       {'id' => '1', 'name' => 'John', 'age' => '25'},
       {'id' => '2', 'name' => 'Jane Updated', 'age' => '30'},
       {'id' => '3', 'name' => 'Bob', 'age' => '22'},
+    ]
+
+    assert_equal(expected_result, result)
+  end
+
+  def test_update_query_without_where
+    query = @request.update('test_data.csv').set({'name' => 'All Updated'})
+    result = query.run
+
+    result = CSV.read('test_data.csv', headers: true).map(&:to_h)
+
+    expected_result = [
+      {'id' => '1', 'name' => 'All Updated', 'age' => '25'},
+      {'id' => '2', 'name' => 'All Updated', 'age' => '30'},
+      {'id' => '3', 'name' => 'All Updated', 'age' => '22'},
     ]
 
     assert_equal(expected_result, result)

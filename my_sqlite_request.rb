@@ -141,17 +141,24 @@ class MySqliteRequest
     CSV.parse(File.read(@table_name), headers: true).each do |row|
         _run_join(row) unless @join_attributes.empty?
 
+        selected_columns = if @select_columns[0] != "*"
+            row.to_hash.slice(*@select_columns).values.join("|")
+        else
+            row.to_hash.values.join("|")
+        end
+
         if @where_params.any?
             @where_params.each do |where_attribute|
                 if row[where_attribute[0]] == where_attribute[1]
-                    result << row.to_hash.slice(*@select_columns)
+                    result << selected_columns
                 end
             end
         else 
-            result << row.to_hash.slice(*@select_columns)
+            result << selected_columns
         end
     end
-    puts result # TODO print the result to STDOUT for CLI, but result still needs to be formatted correctly
+
+    puts result.join("\n")
   end
 
   def _run_insert
@@ -162,26 +169,30 @@ class MySqliteRequest
 
   def _run_delete
     csv = CSV.read(@table_name, headers: true)
-    @where_params.each do |where_attribute|
-        csv.delete_if do |row|
-            row[where_attribute[0]] == where_attribute[1]
-        end
+    
+    csv.delete_if do |row|
+        @where_params.any? ? @where_params.any? { |where_attribute| row[where_attribute[0]] == where_attribute[1] } : true
     end
     File.open(@table_name, 'w') { |f| f.puts(csv) }
   end
 
   def _run_update
     csv = CSV.read(@table_name, headers: true)
-    @where_params.each do |where_attribute|
-        csv.find do |row|
-            if row[where_attribute[0]] == where_attribute[1]
-                @update_set_data.keys.each do |update_key|
-                    update_value = @update_set_data[update_key]
-                    row[update_key] = update_value
-                end
+    csv.each do |row|
+        if @where_params.any?
+          @where_params.each do |where_attribute|
+            next unless row[where_attribute[0]] == where_attribute[1]
+      
+            @update_set_data.each do |update_key, update_value|
+              row[update_key] = update_value
             end
+          end
+        else
+          @update_set_data.each do |update_key, update_value|
+            row[update_key] = update_value
+          end
         end
-    end
+      end
     File.open(@table_name, 'w') { |f| f.puts(csv) }
   end
 
