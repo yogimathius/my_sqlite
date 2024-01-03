@@ -20,7 +20,8 @@ class MySqliteQueryCli
     end
 
     def build_order(string)
-        
+        column_name, order_type = string.split(" ")
+        @request.order(order_type, column_name)
     end
 
     def build_select(string)
@@ -35,7 +36,7 @@ class MySqliteQueryCli
 
         build_where(where_clause) unless where_clause.nil?
 
-        build_order(join_clause) unless order_clause.nil?
+        build_order(order_clause) unless order_clause.nil?
 
         @request.select(select_columns)
                 .from(from_table)
