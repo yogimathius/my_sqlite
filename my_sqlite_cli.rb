@@ -20,6 +20,7 @@ class MySqliteQueryCli
     end
 
     def build_order(string)
+        
     end
 
     def build_select(string)
@@ -73,6 +74,7 @@ class MySqliteQueryCli
     end
 
     def parse(buf)
+        # check for ';' here
         modified_buf = buf.delete("();'") # remove punctuation
         p modified_buf
 
