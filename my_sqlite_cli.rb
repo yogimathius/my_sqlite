@@ -13,15 +13,22 @@ class MySqliteQueryCli
         @request.where(where_key, where_value) unless where_parts.empty?
     end
 
+    def build_join(string)
+        join_table, join_clause = string.split(" ON ")
+        join_id_a, join_id_b = join_clause.split("=").map(&:strip)
+        @request.join(join_table, join_id_a, join_id_b)
+    end
+
     def build_select(string)
         remaining_clause, where_clause = string.split("SELECT ")[1].split(" WHERE ")
 
-        select_clause, from_table = remaining_clause.split("FROM ")
+        select_clause, from_clause = remaining_clause.split("FROM ")
+        from_table, join_clause = from_clause.split(" JOIN ")
         select_columns = select_clause.split(/[,\s]+/)
 
-        
+        build_join(join_clause) unless join_clause.nil?
+
         build_where(where_clause) unless where_clause.nil?
-        
 
         @request.select(select_columns)
                 .from(from_table)
@@ -85,9 +92,10 @@ class MySqliteQueryCli
     end
 end
 
-# def _main()
-#     mysqcli = MySqliteQueryCli.new
-#     mysqcli.run!
-# end
+
+def _main()     # main must be left uncommented to run CLI in docode
+    mysqcli = MySqliteQueryCli.new
+    mysqcli.run!
+end
     
-# _main()
+_main()
