@@ -19,9 +19,9 @@ class MySqliteQueryCli
         select_clause, from_table = remaining_clause.split("FROM ")
         select_columns = select_clause.split(/[,\s]+/)
 
-        
+        # TODO: check for and parse join
+
         build_where(where_clause) unless where_clause.nil?
-        
 
         @request.select(select_columns)
                 .from(from_table)
