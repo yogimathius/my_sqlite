@@ -56,7 +56,7 @@ class MySqliteRequest
     self
   end
 
-  def order(order_type, column_name)
+  def order(column_name, order_type)
     @order = order_type
     @order_column = column_name
     self
