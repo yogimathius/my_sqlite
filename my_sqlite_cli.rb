@@ -16,7 +16,6 @@ class MySqliteQueryCli
     def build_join(string)
         join_table, join_clause = string.split(" ON ")
         join_id_a, join_id_b = join_clause.split("=").map(&:strip)
-        puts "join_table = #{join_table}\njoin_ids = #{join_id_a}, #{join_id_b}"
         @request.join(join_table, join_id_a, join_id_b)
     end
 
@@ -93,9 +92,10 @@ class MySqliteQueryCli
     end
 end
 
-# def _main()
-#     mysqcli = MySqliteQueryCli.new
-#     mysqcli.run!
-# end
+
+def _main()     # main must be left uncommented to run CLI in docode
+    mysqcli = MySqliteQueryCli.new
+    mysqcli.run!
+end
     
-# _main()
+_main()
