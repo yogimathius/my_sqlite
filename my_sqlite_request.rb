@@ -13,6 +13,10 @@ require 'csv'
 
 class MySqliteRequest
   def initialize
+    reset
+  end
+
+  def reset 
     @type_of_request    = :none
     @select_columns     = []
     @where_params       = []
@@ -158,7 +162,8 @@ class MySqliteRequest
         end
     end
 
-    puts result.join("\n")
+    puts result.empty? ? "No results found." : result.join("\n")
+    
   end
 
   def _run_insert

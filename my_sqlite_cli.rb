@@ -87,6 +87,7 @@ class MySqliteQueryCli
         while buf = Readline.readline("my_sqlite_cli > ", true)
             parse(buf)
             @request.run
+            @request.reset
         end
 
     end
