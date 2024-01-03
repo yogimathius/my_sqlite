@@ -14,7 +14,7 @@ class MySqliteQueryCli
     end
 
     def build_join(string)
-        join_table, join_clause = string.split("ON").s
+        join_table, join_clause = string.split(" ON ")
         join_id_a, join_id_b = join_clause.split("=").map(&:strip)
         puts "join_table = #{join_table}\njoin_ids = #{join_id_a}, #{join_id_b}"
         @request.join(join_table, join_id_a, join_id_b)
@@ -24,7 +24,7 @@ class MySqliteQueryCli
         remaining_clause, where_clause = string.split("SELECT ")[1].split(" WHERE ")
 
         select_clause, from_clause = remaining_clause.split("FROM ")
-        from_table, join_clause = from_clause.split("JOIN ")
+        from_table, join_clause = from_clause.split(" JOIN ")
         select_columns = select_clause.split(/[,\s]+/)
 
         build_join(join_clause) unless join_clause.nil?
