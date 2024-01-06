@@ -102,10 +102,9 @@ class MySqliteQueryCli
     end
 end
 
-
-# def _main()     # main must be left uncommented to run CLI in docode
-#     mysqcli = MySqliteQueryCli.new
-#     mysqcli.run!
-# end
+def _main()     # main must be left uncommented to run CLI in docode
+    mysqcli = MySqliteQueryCli.new
+    mysqcli.run!
+end
     
-# _main()
+_main() unless ENV['TEST']
