@@ -172,6 +172,8 @@ class MySqliteRequest
     File.open(@table_name, 'a') do |f|
         f.puts @insert_attributes.values.join(',')
     end
+    rescue => error
+        puts "error inserting into table: '#{@table_name}': #{error}"
   end
 
   def _run_delete
@@ -181,6 +183,8 @@ class MySqliteRequest
         @where_params.any? ? @where_params.any? { |where_attribute| row[where_attribute[0]] == where_attribute[1] } : true
     end
     File.open(@table_name, 'w') { |f| f.puts(csv) }
+    rescue => error
+        puts "error deleting from table: '#{@table_name}': #{error}"
   end
 
   def _run_update
@@ -201,6 +205,8 @@ class MySqliteRequest
         end
       end
     File.open(@table_name, 'w') { |f| f.puts(csv) }
+    rescue => error
+        puts "error updating table: '#{@table_name}': #{error}"
   end
 
   def _run_join(row)
@@ -211,6 +217,8 @@ class MySqliteRequest
             end
         end
     end
+    rescue => error
+        puts "error joining table: '#{@join_attributes[:filename_db_b]}': #{error}"
   end
 
   def _setTypeOfRequest(new_type)
