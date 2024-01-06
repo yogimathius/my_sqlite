@@ -110,7 +110,9 @@ class MySqliteQueryCli
     end
 end
 
-def _main()     # main must be left uncommented to run CLI in docode
+# to run my_sqlite_cli_test.rb, comment out _main()
+# to run in cli, _main() is required
+def _main()     
     mysqcli = MySqliteQueryCli.new
     mysqcli.run!
 end
