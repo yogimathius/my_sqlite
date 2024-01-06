@@ -1,9 +1,11 @@
 require "readline"
 require_relative "my_sqlite_request"
+require_relative "cli_helpers"
 
 class MySqliteQueryCli
     def initialize
         @request = MySqliteRequest.new
+        @cli_helpers = CliHelpers.new
     end
 
     def build_where(string)
@@ -13,8 +15,7 @@ class MySqliteQueryCli
         @request.where(where_key, where_value) unless where_parts.empty?
     end
 
-    def build_join(string)
-        join_table, join_clause = string.split(/ ON /i)
+    def build_join(join_table, join_clause)
         join_id_a, join_id_b = join_clause.split("=").map(&:strip)
         @request.join(join_table, join_id_a, join_id_b)
     end
@@ -25,21 +26,20 @@ class MySqliteQueryCli
     end
 
     def build_select(string)
-        remaining_clause, order_clause = string.split(/ ORDER BY /i)
-        remaining_clause, where_clause = remaining_clause.split(/ WHERE /i)
-        remaining_clause, join_clause = remaining_clause.split(/ JOIN /i)
-        select_clause, from_table = string.split(/SELECT /i)[1].split(/FROM /i)
+        delimiters = ['SELECT ', ' FROM ', ' JOIN ', ' ON ', ' WHERE ', ' ORDER BY']
 
-        select_columns = select_clause.split(/[,\s]+/)
+        select_object = @cli_helpers.parse_string(string, delimiters)
+        
+        select_columns = select_object[:SELECT].split(/[,\s]+/)
 
-        build_join(join_clause) unless join_clause.nil?
+        build_join(select_object[:JOIN], select_object[:ON]) unless select_object[:JOIN].nil? or select_object[:ON].nil?
 
-        build_where(where_clause) unless where_clause.nil?
+        build_where(select_object[:WHERE]) unless select_object[:WHERE].nil?
 
-        build_order(order_clause) unless order_clause.nil?
+        build_order(select_object[:ORDER]) unless select_object[:ORDER].nil?
 
         @request.select(select_columns)
-                .from(from_table)
+                .from(select_object[:FROM])
     end
 
     def build_insert(string)
@@ -75,25 +75,33 @@ class MySqliteQueryCli
     end
 
     def parse(buf)
-        # check for ';' here
-        modified_buf = buf.delete("();'") # remove punctuation
-        p modified_buf
+        if buf.include?(';')
 
-        if modified_buf.match?(/SELECT/i)
-            result = build_select(modified_buf)
-        elsif modified_buf.match?(/INSERT/i)
-            result = build_insert(modified_buf)
-        elsif modified_buf.match?(/UPDATE/i)
-            result = build_update(modified_buf)
-        elsif modified_buf.match?(/DELETE/i)
-            result = build_delete(modified_buf)
+            modified_buf = buf.delete("();'") # remove punctuation
+            p modified_buf
+
+            if modified_buf.match?(/SELECT/i)
+                result = build_select(modified_buf)
+            elsif modified_buf.match?(/INSERT/i)
+                result = build_insert(modified_buf)
+            elsif modified_buf.match?(/UPDATE/i)
+                result = build_update(modified_buf)
+            elsif modified_buf.match?(/DELETE/i)
+                result = build_delete(modified_buf)
+            end
+            
+            result 
+        else
+            puts "Invalid syntax: #{buf} does not include closing `;`" unless buf.include?(';')
+
         end
-        
-        result 
     end
 
     def run!
         while buf = Readline.readline("my_sqlite_cli > ", true)
+            if buf == 'quit'
+                break
+            end
             parse(buf)
             @request.run
             @request.reset
@@ -102,10 +110,9 @@ class MySqliteQueryCli
     end
 end
 
-
-# def _main()     # main must be left uncommented to run CLI in docode
-#     mysqcli = MySqliteQueryCli.new
-#     mysqcli.run!
-# end
+def _main()     # main must be left uncommented to run CLI in docode
+    mysqcli = MySqliteQueryCli.new
+    mysqcli.run!
+end
     
-# _main()
+_main() unless ENV['TEST']
