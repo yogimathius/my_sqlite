@@ -142,6 +142,7 @@ class MySqliteRequest
 
   def _run_select
     result = []
+    p File.read(@table_name)
     CSV.parse(File.read(@table_name), headers: true).each do |row|
         _run_join(row) unless @join_attributes.empty?
 
@@ -163,7 +164,8 @@ class MySqliteRequest
     end
 
     puts result.empty? ? "No results found." : result.join("\n")
-    
+    rescue => error
+        puts "error selecting from table: '#{@table_name}': #{error}"
   end
 
   def _run_insert
