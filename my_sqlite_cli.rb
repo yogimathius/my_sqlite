@@ -26,7 +26,9 @@ class MySqliteQueryCli
     end
 
     def build_select(string)
-        select_object = @cli_helpers.parse_select(string)
+        delimiters = ['SELECT ', ' FROM ', ' JOIN ', ' ON ', ' WHERE ', ' ORDER BY']
+
+        select_object = @cli_helpers.parse_string(string, delimiters)
         
         select_columns = select_object[:SELECT].split(/[,\s]+/)
 
@@ -92,6 +94,9 @@ class MySqliteQueryCli
 
     def run!
         while buf = Readline.readline("my_sqlite_cli > ", true)
+            if buf == 'quit'
+                break
+            end
             parse(buf)
             @request.run
             @request.reset

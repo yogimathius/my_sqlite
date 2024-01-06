@@ -11,9 +11,7 @@ class CliHelpers
         parts
     end
 
-    def parse_select(string)
-        delimiters = ['SELECT ', ' FROM ', ' JOIN ', ' ON ', ' WHERE ', ' ORDER BY']
-
+    def parse_string(string, delimiters)
         result = {}
         delimiters.each do |delimiter|
             parts = string.split(delimiter)[1] if string.include?(delimiter)
