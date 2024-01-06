@@ -1,9 +1,11 @@
 require "readline"
 require_relative "my_sqlite_request"
+require_relative "cli_helpers"
 
 class MySqliteQueryCli
     def initialize
         @request = MySqliteRequest.new
+        @cli_helpers = CliHelpers.new
     end
 
     def build_where(string)
@@ -13,8 +15,7 @@ class MySqliteQueryCli
         @request.where(where_key, where_value) unless where_parts.empty?
     end
 
-    def build_join(string)
-        join_table, join_clause = string.split(/ ON /i)
+    def build_join(join_table, join_clause)
         join_id_a, join_id_b = join_clause.split("=").map(&:strip)
         @request.join(join_table, join_id_a, join_id_b)
     end
@@ -25,21 +26,18 @@ class MySqliteQueryCli
     end
 
     def build_select(string)
-        remaining_clause, order_clause = string.split(/ ORDER BY /i)
-        remaining_clause, where_clause = remaining_clause.split(/ WHERE /i)
-        remaining_clause, join_clause = remaining_clause.split(/ JOIN /i)
-        select_clause, from_table = string.split(/SELECT /i)[1].split(/FROM /i)
+        select_object = @cli_helpers.parse_select(string)
+        
+        select_columns = select_object[:SELECT].split(/[,\s]+/)
 
-        select_columns = select_clause.split(/[,\s]+/)
+        build_join(select_object[:JOIN], select_object[:ON]) unless select_object[:JOIN].nil? or select_object[:ON].nil?
 
-        build_join(join_clause) unless join_clause.nil?
+        build_where(select_object[:WHERE]) unless select_object[:WHERE].nil?
 
-        build_where(where_clause) unless where_clause.nil?
-
-        build_order(order_clause) unless order_clause.nil?
+        build_order(select_object[:ORDER]) unless select_object[:ORDER].nil?
 
         @request.select(select_columns)
-                .from(from_table)
+                .from(select_object[:FROM])
     end
 
     def build_insert(string)
