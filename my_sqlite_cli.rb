@@ -75,21 +75,26 @@ class MySqliteQueryCli
     end
 
     def parse(buf)
-        # check for ';' here
-        modified_buf = buf.delete("();'") # remove punctuation
-        p modified_buf
+        if buf.include?(';')
 
-        if modified_buf.match?(/SELECT/i)
-            result = build_select(modified_buf)
-        elsif modified_buf.match?(/INSERT/i)
-            result = build_insert(modified_buf)
-        elsif modified_buf.match?(/UPDATE/i)
-            result = build_update(modified_buf)
-        elsif modified_buf.match?(/DELETE/i)
-            result = build_delete(modified_buf)
+            modified_buf = buf.delete("();'") # remove punctuation
+            p modified_buf
+
+            if modified_buf.match?(/SELECT/i)
+                result = build_select(modified_buf)
+            elsif modified_buf.match?(/INSERT/i)
+                result = build_insert(modified_buf)
+            elsif modified_buf.match?(/UPDATE/i)
+                result = build_update(modified_buf)
+            elsif modified_buf.match?(/DELETE/i)
+                result = build_delete(modified_buf)
+            end
+            
+            result 
+        else
+            puts "Invalid syntax: #{buf} does not include closing `;`" unless buf.include?(';')
+
         end
-        
-        result 
     end
 
     def run!
