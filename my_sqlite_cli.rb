@@ -43,32 +43,44 @@ class MySqliteQueryCli
     end
 
     def build_insert(string)
-        insert_clause, remaining_clause = string.split(/ VALUES /i)
-        insert_into = insert_clause.split(/INTO /i)[1]
-        values = remaining_clause.split(",").map(&:strip)
+        delimiters = ['INTO ', ' VALUES ']
+
+        insert_object = @cli_helpers.parse_string(string, delimiters)
+
+        insert_into = insert_object[:INTO]
+
+        values = insert_object[:VALUES].split(",").map(&:strip)
+
         @request.insert(insert_into)
                 .values(values)
     end
 
     def build_update(string)
-        update_clause, remaining_clause = string.split(/ SET /i)
-        update_from = update_clause.split(" ")[1]
-        set_clause, where_clause = remaining_clause.split(/ WHERE /i)
-        set_hash = set_clause.split(",").map do |part|
+        delimiters = ['UPDATE ', ' SET ', ' WHERE ']
+
+        update_object = @cli_helpers.parse_string(string, delimiters)
+
+        update_from = update_object[:UPDATE]
+
+        set_hash = update_object[:SET].split(",").map do |part|
             key, value = part.split('=').map(&:strip)
             [key, value]
         end.to_h
 
-        build_where(where_clause) unless where_clause.nil?
+        build_where(update_object[:WHERE]) unless update_object[:WHERE].nil?
 
         @request.update(update_from)
                 .set(set_hash)
     end
 
     def build_delete(string)
-        delete_from, where_clause = string.split(/FROM /i)[1].split(/ WHERE /i)
-        
-        build_where(where_clause) unless where_clause.nil?
+        delimiters = ['FROM ', ' WHERE ']
+
+        delete_object = @cli_helpers.parse_string(string, delimiters)
+
+        delete_from = delete_object[:FROM]
+
+        build_where(delete_object[:WHERE]) unless delete_object[:WHERE].nil?
 
         @request.delete
                 .from(delete_from)
