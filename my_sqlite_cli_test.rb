@@ -9,7 +9,7 @@ class TestMySqliteQueryCli < Test::Unit::TestCase
   end
 
   def test_build_select
-    query = "SELECT name, age FROM test_data.csv WHERE name = 'John Doe'"    
+    query = "SELECT name, age FROM test_data.csv WHERE name = 'John Doe';"    
     result = @cli.parse(query)
     assert_equal(:select, result.instance_variable_get(:@type_of_request))
     assert_equal(["name", "age"], result.instance_variable_get(:@select_columns))
@@ -18,7 +18,7 @@ class TestMySqliteQueryCli < Test::Unit::TestCase
   end
 
   def test_build_select_with_join
-    query = "SELECT name, age, dog_name FROM test_data.csv JOIN joins_data.csv ON id = owner_id WHERE name = 'John Doe'"
+    query = "SELECT name, age, dog_name FROM test_data.csv JOIN joins_data.csv ON id = owner_id WHERE name = 'John Doe';"
     result = @cli.parse(query)
     assert_equal(:select, result.instance_variable_get(:@type_of_request))
     assert_equal(["name", "age", "dog_name"], result.instance_variable_get(:@select_columns))
@@ -28,7 +28,7 @@ class TestMySqliteQueryCli < Test::Unit::TestCase
   end
 
   def test_build_update
-    query = "UPDATE test_data.csv SET name = 'John Updated', age = '99' WHERE name = 'John Doe'"
+    query = "UPDATE test_data.csv SET name = 'John Updated', age = '99' WHERE name = 'John Doe';"
     result = @cli.parse(query)
     assert_equal(:update, result.instance_variable_get(:@type_of_request))
     assert_equal({"age"=>"99", "name"=>"John Updated"}, result.instance_variable_get(:@update_set_data))
