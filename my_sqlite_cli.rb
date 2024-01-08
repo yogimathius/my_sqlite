@@ -25,6 +25,14 @@ class MySqliteQueryCli
         @request.order(order_type, column_name)
     end
 
+    def build_set(string)
+        set_hash = string.split(",").map do |part|
+            key, value = part.split('=').map(&:strip)
+            [key, value]
+        end.to_h
+        @request.set(set_hash)
+    end
+
     def build_select(string)
         delimiters = ['SELECT ', ' FROM ', ' JOIN ', ' ON ', ' WHERE ', ' ORDER BY']
 
@@ -62,15 +70,12 @@ class MySqliteQueryCli
 
         update_from = update_object[:UPDATE]
 
-        set_hash = update_object[:SET].split(",").map do |part|
-            key, value = part.split('=').map(&:strip)
-            [key, value]
-        end.to_h
+        build_set(update_object[:SET]) unless update_object[:SET].nil?
 
         build_where(update_object[:WHERE]) unless update_object[:WHERE].nil?
 
         @request.update(update_from)
-                .set(set_hash)
+
     end
 
     def build_delete(string)
