@@ -12,7 +12,6 @@ class MySqliteRequestTest < Test::Unit::TestCase
 
   def test_select_query
     query = @request.from('test_data.csv').select(['name', 'age']).where('id', '2')
-    stdout = $stdout
     $stdout = StringIO.new
     
     result = query.run
@@ -105,15 +104,15 @@ class MySqliteRequestTest < Test::Unit::TestCase
         .from('test_data.csv')
         .select(['name', 'age', 'pet_name', 'pet_type'])
         .join('joins_data.csv', 'id', 'person_id')
+    $stdout = StringIO.new
 
     result = query.run
 
-    expected_result = [
-        {'name' => 'John', 'age' => '25', 'pet_name' => 'Woof', 'pet_type' => 'dog'},
-        {'name' => 'Jane', 'age' => '30', 'pet_name' => 'Kitty', 'pet_type' => 'tiger'},
-        {'name' => 'Bob', 'age' => '22', 'pet_name' => 'Smokey', 'pet_type' => 'bear'},
-    ]
-    assert_equal(expected_result, result)
+    expected_result =
+        "John|25|Woof|dog\n" +
+        "Jane|30|Kitty|tiger\n" +
+        "Bob|22|Smokey|bear\n"
+    assert_equal(expected_result, $stdout.string)
   end
 
 
