@@ -95,7 +95,7 @@ class MySqliteQueryCli
         if buf.include?(';')
 
             modified_buf = buf.delete("();'") # remove punctuation
-            p modified_buf
+            # TESTING ONLY # p modified_buf
 
             if modified_buf.match?(/SELECT/i)
                 result = build_select(modified_buf)

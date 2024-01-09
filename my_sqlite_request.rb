@@ -142,7 +142,7 @@ class MySqliteRequest
 
   def _run_select
     result = []
-    p File.read(@table_name)
+    # TESTING ONLY # p File.read(@table_name)  
     CSV.parse(File.read(@table_name), headers: true).each do |row|
         _run_join(row) unless @join_attributes.empty?
 
@@ -230,49 +230,3 @@ class MySqliteRequest
   end
 end
 
-# request = MySqliteRequest.new
-
-# ===== testing select query =====
-# request = request.from('nba_player_data.csv')
-# request = request.select('name')
-# request = request.where('year_start', '1991') # can be called optionally
-# p request.run
-
-# ===== testing select with join query =====
-# request = request
-#     .from('nba_player_data_light.csv')
-#     .select(['name', 'weight', 'collage', 'birth_city'])
-#     .join('nba_players_light.csv', 'name', 'player')
-
-# request.run.each do |player|
-#     p player
-# end
-
-# ===== testing insert query ======
-# request = request.insert('nba_player_data_light.csv')
-# request = request.values({
-#     "name" => "Bud Acton",
-#     "year_start" => "1968",
-#     "year_end" => "1968",
-#     "position" => "F",
-#     "height" => "6-6" ,
-#     "weight" => "210",
-#     "birth_date" => "January 11, 1942",
-#     "college" => "Hillsdale College"
-# })
-# request = request.where('year_start', '1991')
-# request = 
-# request.run
-
-# ===== testing update query =====
-# request = request.update('nba_player_data_light.csv')
-# request = request.set({"name" => "Bud Updated", "college" => "Hillsdale College Updated"})
-# request = request.where('name', 'Bud Acton')
-# request.run
-
-# ===== testing delete query =====
-# request = MySqliteRequest.new
-# request = request.from('nba_player_data_light.csv')
-# request = request.delete
-# request = request.where('college', 'Hillsdale College Updated')
-# request.run
