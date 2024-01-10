@@ -170,7 +170,7 @@ class MySqliteRequest
 
   def _run_insert
     File.open(@table_name, 'a') do |f|
-        f.puts @insert_attributes.values.join(',')
+        f.puts @insert_attributes.join(',')
     end
     rescue => error
         puts "error inserting into table: '#{@table_name}': #{error}"
