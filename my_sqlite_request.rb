@@ -142,14 +142,18 @@ class MySqliteRequest
 
   def _run_select
     result = []
-    # TESTING ONLY # p File.read(@table_name)  
-    CSV.parse(File.read(@table_name), headers: true).each do |row|
-        _run_join(row) unless @join_attributes.empty?
+    count = 0
+
+    data = @join_attributes.empty? ? CSV.parse(File.read(@table_name), headers: true) : _run_join_select
+    
+    data.each_with_index do |row, index|
+        next if index == 0 && @join_attributes.any?
+        row = row.to_hash unless row.class == Hash
 
         selected_columns = if @select_columns[0] != "*"
-            row.to_hash.slice(*@select_columns).values.join("|")
+            row.slice(*@select_columns).values.join("|")
         else
-            row.to_hash.values.join("|")
+            row.values.join("|")
         end
 
         if @where_params.any?
@@ -168,6 +172,39 @@ class MySqliteRequest
         puts "error selecting from table: '#{@table_name}': #{error}"
   end
 
+  # Borrowed from https://stackoverflow.com/questions/58304715/merge-csv-files-same-unique-id-with-ruby
+  def _run_join_select
+    dict = Hash.new
+
+    csv_one = CSV.read(@table_name, headers: true)
+    csv_two = CSV.read(@join_attributes[:filename_db_b], headers: true)
+
+    rows = [[csv_one.headers, csv_two.headers].flatten]
+
+    # read file1
+    csv_one.each do |row|
+        row = row.to_h
+        user = "#{row[@join_attributes[:column_on_db_a]]}"
+        dict[user] = row
+    end
+
+    # read file2
+    csv_two.each do |row|
+        row = row.to_h
+        user = "#{row[@join_attributes[:column_on_db_b]]}"
+        row.delete(@join_attributes[:column_on_db_b])
+        dict[user] = row.merge(dict[user]) if dict[user]
+    end
+
+    # # turn hash into rows
+    dict.each do |key, value|
+        rows.push(value)
+    end
+    rows
+    rescue => error
+        puts "error joining table: '#{@join_attributes[:filename_db_b]}': #{error}"
+  end
+  
   def _run_insert
     File.open(@table_name, 'a') do |f|
         f.puts @insert_attributes.join(',')
@@ -207,18 +244,6 @@ class MySqliteRequest
     File.open(@table_name, 'w') { |f| f.puts(csv) }
     rescue => error
         puts "error updating table: '#{@table_name}': #{error}"
-  end
-
-  def _run_join(row)
-    CSV.parse(File.read(@join_attributes[:filename_db_b]), headers: true).each do |join_row|
-        if row[@join_attributes[:column_on_db_a]] == join_row[@join_attributes[:column_on_db_b]]
-            join_row.each do |key_value|
-                row.push(key_value)
-            end
-        end
-    end
-    rescue => error
-        puts "error joining table: '#{@join_attributes[:filename_db_b]}': #{error}"
   end
 
   def _setTypeOfRequest(new_type)

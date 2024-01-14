@@ -47,7 +47,7 @@ perform various queries such as:
 
 `SELECT * FROM nba_player_data.csv;`
 `SELECT name, age FROM nba_player_data.csv;`
-`SELECT name, birth_city FROM nba_player_data_light.csv JOIN nba_players.csv ON name=Player;`
+`SELECT name, birth_city FROM nba_player_data.csv JOIN nba_players.csv ON name=Player;`
 
 `INSERT INTO nba_player_data.csv VALUES (name, year_start, year_end, position, height, weight, birth_date, college);`
 
