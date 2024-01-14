@@ -51,6 +51,12 @@ perform various queries such as:
 
 `INSERT INTO nba_player_data.csv VALUES (name, year_start, year_end, position, height, weight, birth_date, college);`
 
+`UPDATE nba_player_data.csv SET name = 'name Updated', year_start = '99' WHERE name = 'name';`
+
+`DELETE FROM nba_player_data.csv WHERE name = 'name Updated';`
+
+...etc
+
 ### Running tests
 
 `ruby my_sqlite_request_test.rb && TEST=true ruby my_sqlite_cli_test.rb`
