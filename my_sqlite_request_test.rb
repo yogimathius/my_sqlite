@@ -32,7 +32,7 @@ class MySqliteRequestTest < Test::Unit::TestCase
   end
 
   def test_insert_query
-    query = @request.insert('test_data.csv').values({'id' => '4', 'name' => 'Alice', 'age' => '28'})
+    query = @request.insert('test_data.csv').values(['4', 'Alice', '28'])
     query.run
 
     result = CSV.read('test_data.csv', headers: true).map(&:to_h)
